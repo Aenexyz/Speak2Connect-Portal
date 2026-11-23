@@ -2,7 +2,9 @@
 
 An agency portal for Speak2Connect: freelancer profiles and availability, daily timesheets, and weekly payslips, with an admin view for HR.
 
-Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: add `#admin` to the end of the link)
+Live versions:
+- **GitHub Pages (saves to Firebase):** https://aenexyz.github.io/Speak2Connect-Portal/ (admin sign-in: https://aenexyz.github.io/Speak2Connect-Portal/#admin)
+- **claude.ai (saves to claude.ai storage):** https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E
 
 ## Features
 
