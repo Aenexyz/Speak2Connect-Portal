@@ -577,7 +577,7 @@ async function firebaseDB(cfg){if(!window.firebase||!window.firebase.initializeA
  if(!db){clearTimeout(timer);loaded=true;dbNote(useFb?'Could not connect to Firebase. Check the settings in firebase-config.js, and that Firestore and Anonymous sign-in are turned on in your Firebase project.':window.claude?'Saving is not available in this view. Open the portal on claude.ai while signed in to store data.':'Saving is not set up on this copy. Add your Firebase project settings to firebase-config.js (see the README).');render();return}
  const cols=['people','timesheets','rates','payslips','notes'];let first=new Set();
  const onData=()=>{if(first.size>=cols.length&&!loaded){loaded=true;clearTimeout(timer);dbNote('')}if(view()!==lastView)render();else renderData()};
- const fail=()=>{clearTimeout(timer);loaded=true;dbNote('Lost connection to storage. Reopen the portal to reconnect.');render()};
+ const fail=e=>{clearTimeout(timer);loaded=true;dbNote(e&&e.code==='permission-denied'?'Firebase refused access. In Firebase, check that Firestore Rules say "allow read, write: if request.auth != null;" and are published, and that Anonymous sign-in is enabled.':'Lost connection to storage. Reopen the portal to reconnect.');render()};
  cols.forEach(c=>col(c).onSnapshot(s=>{const o={};s.docs.forEach(d=>{o[d.id]=d.data()});S[c]=o;first.add(c);onData()},fail));
  db.doc('settings/app').onSnapshot(d=>{S.settings={fx:0,...(d.exists?d.data():{})};onData()},()=>{});
 })();
