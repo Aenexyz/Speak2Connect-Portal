@@ -17,6 +17,7 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 **Freelancer**
 - Sign-up questions in five steps. The portal writes a portfolio summary and headline from the answers, and the freelancer can edit them before saving.
 - Past clients: "+ Add another client" adds as many as needed, each with a start month and an end month (or "Still working here"). The profile shows each one with how long the freelancer worked there.
+- Optional Upwork profile link; when given, the profile shows an **UPWORK** button that opens it.
 - A Vocaroo voice-recording link is required. The freelancer ticks a box to confirm the recording is 1 minute or shorter.
 - **Profile photo:** upload, change or remove a photo; it is cropped to a square and resized before saving. Until a photo is added, the Profile tab shows a notice: "Recommended: add a professional-looking photo". Admins see the photo in the agents list and profiles.
 - **Profile:** portfolio and availability to work. Instead of a weekly schedule, a freelancer can choose **Not available at the moment**, with an optional return date and note; the admin is notified and sees them in a separate "Not available at the moment" list. The freelancer picks a time zone and sets hours for each day, then submits. Submitting notifies the admin.
@@ -44,7 +45,7 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 | `firebase-config.js` | Firebase settings for hosting outside claude.ai (`null` = use claude.ai storage) |
 | `firestore.rules` | Security rules to paste into your Firebase project |
 
-To rebuild `index.html` from the template, replace `{{EMBLEM}}` and `{{LOGO}}` with the base64 of `assets/emblem.png` and `assets/logo-banner.jpg`.
+To rebuild `index.html` from the template, replace `{{EMBLEM}}`, `{{LOGO}}` and `{{UPWORK}}` with the base64 of `assets/emblem.png`, `assets/logo-banner.jpg` and `assets/upwork.png`.
 
 ## Data storage
 
