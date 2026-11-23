@@ -263,7 +263,7 @@ function loginHTML(v){
  ${f?`<form class="stackf" id="loginForm" data-role="${r}" data-mode="${cr?'create':'signin'}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':cr?'Create account':'Sign in'}</button>
  ${r==='admin'?'':cr?`<p class="small mute" style="text-align:center">Already have an account? <button type="button" class="btn link" data-act="loginMode" data-k="signin">Sign in</button></p>`:`<p class="small mute" style="text-align:center">New freelancer? <button type="button" class="btn link" data-act="loginMode" data-k="create">Create an account</button><br>Forgot your password? Ask your admin.</p>`}</form>`:''}
  ${r==='freelancer'&&!cr?`<div class="row" style="justify-content:center"><span class="small mute">Test accounts (password test1234):</span>${TEST.map(t=>`<button class="btn sm ghost" data-act="testLogin" data-k="${t}">${t}</button>`).join('')}</div>`:''}
- ${r==='admin'?`<button class="btn link" data-act="leaveAdmin">Back to freelancer sign-in</button>`:`<p class="small mute">HR or company admin? Use your admin sign-in link.</p>`}
+ ${r==='admin'?`<button class="btn link" data-act="leaveAdmin">Back to freelancer sign-in</button>`:`<p class="small mute">HR, company or payroll admin? <a href="#admin">Admin sign-in</a></p>`}
  </div></div>`}
 
 function renderOnboard(){const el=$('#ob');if(!el)return;const a=ui.ob;
