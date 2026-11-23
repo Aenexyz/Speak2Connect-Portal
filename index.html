@@ -177,7 +177,7 @@ const STEPS=[
  {t:'About you',d:'The basics clients see first.',f:[{k:'name',l:'Full name',req:1},{k:'location',l:'City and country',req:1,ph:'Cebu City, Philippines'},{k:'phone',l:'Phone or WhatsApp',ph:'Optional'}]},
  {t:'Your work',d:'What you do and where you have done it.',f:[{k:'role',l:'Primary role',type:'select',opts:Object.keys(ROLES),req:1},{k:'roleOther',l:'If Other, describe your role',ph:'e.g. Medical receptionist'},{k:'years',l:'Years of experience',type:'number',req:1},{k:'industries',l:'Industries you have worked in',type:'tags'},{k:'upwork',l:'Upwork profile link',ph:'https://www.upwork.com/freelancers/~…',hint:'Optional. Open your Upwork profile, copy the link from the address bar and paste it here.'}]},
  {t:'Skills and tools',d:'Add your key skills and the tools you use, and list your languages.',f:[{k:'skills',l:'Key skills',req:1,type:'tags'},{k:'tools',l:'Tools and software',type:'tags'},{k:'languages',l:'Languages',req:1,ph:'English, Filipino'}]},
- {t:'Highlights',d:'Proof of your work.',f:[{k:'achievement',l:'Your proudest work result',type:'textarea',req:1,ph:'Booked 120+ appointments a month for a US roofing company'},{k:'pastList',l:'Past clients or companies',type:'past'},{k:'education',l:'Education or certifications',ph:'Optional'}]},
+ {t:'Highlights',d:'Proof of your work.',f:[{k:'pastList',l:'Past clients or companies',type:'past'},{k:'education',l:'Education or certifications',ph:'Optional'}]},
  {t:'Setup and voice',d:'Your workstation and a short voice introduction.',f:[{k:'speed',l:'Internet speed (Mbps)',type:'number'},{k:'backup',l:'I have backup internet or power',type:'check'},{k:'shift',l:'Preferred shift',type:'select',opts:SHIFTS},{k:'vocaroo',l:'Vocaroo link to your voice recording',req:1,ph:'https://voca.ro/…',hint:'Record a short introduction at vocaroo.com, then paste the share link here. Keep it to 1 minute or less.'},{k:'vocOk',l:'My recording is 1 minute or shorter',type:'check',req:1}]}
 ];
 let db=null,loaded=false;
@@ -228,7 +228,6 @@ const article=w=>/^[aeiou]/i.test(w)?'an':'a';
 function makeSummary(a){const role=(a.role==='Other'?a.roleOther:ROLES[a.role])||a.roleOther||'remote professional';const y=+a.years||0;const ind=list(a.industries).map(low);
  const out=[`${a.name} is ${article(role)} ${role.toLowerCase()} based in ${a.location} with ${y} year${y===1?'':'s'} of experience${ind.length?` across ${joinA(ind)}`:''}.`,`Core strengths include ${joinA(list(a.skills).map(low))}.`];
  if(list(a.tools).length)out.push(`Works confidently in ${joinA(list(a.tools))}.`);
- if(a.achievement)out.push(`Highlight: ${a.achievement.trim().replace(/\.?$/,'.')}`);
  const pl=cleanPast(a.pastList);if(pl.length)out.push(`Has supported ${joinA(pl.map(x=>`${x.name} (${mRange(x)})`))}.`);else if(a.past)out.push(`Has supported ${a.past.trim().replace(/\.$/,'')}.`);
  if(a.education)out.push(`Background: ${a.education.trim().replace(/\.?$/,'.')}`);
  out.push(`Speaks ${joinA(list(a.languages))}${a.speed?`, works on a ${a.speed} Mbps connection`:''}${a.backup?' with backup internet or power':''}${a.shift?`, and prefers ${a.shift.charAt(0).toLowerCase()+a.shift.slice(1)}`:''}.`);
