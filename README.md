@@ -33,7 +33,7 @@ Live versions:
 - **Timesheets:** weekly grid of agents by day. Click an agent to see their entries, then click an entry to view, edit or delete it.
 - **Payslips:**
   - Enter the USD to PHP exchange rate.
-  - Set the rate for each agent and client, either **USD / hour** (hours × rate × exchange rate) or a **PHP / week** rate for a 40-hour week (paid per hour as rate ÷ 40 × hours logged, e.g. ₱5,000/week = ₱125/h; the payslip shows its USD equivalent for reference).
+  - Set the rate for each agent and client (default **USD / hour**; the gear next to each rate switches it), either **USD / hour** (hours × rate × exchange rate) or a **PHP / week** rate for a 40-hour week (paid per hour as rate ÷ 40 × hours logged, e.g. ₱5,000/week = ₱125/h; the payslip shows its USD equivalent for reference).
   - Auto-generate payslips for each weekly cutoff (Monday to Sunday).
   - Edit lines and adjustments (bonuses or deductions in PHP).
   - View, release or unrelease payslips, or copy them as text.
