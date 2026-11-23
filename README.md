@@ -61,7 +61,7 @@ Without Firebase settings, a copy hosted outside claude.ai loads but shows "Savi
 
 1. Go to https://console.firebase.google.com, click **Create a project**, and give it a name (e.g. `speaknlink-portal`). Google Analytics is optional.
 2. **Create the database:** in the left menu, open **Build > Firestore Database > Create database**. Pick a location near your team (e.g. `asia-southeast1` for Singapore), and start in **production mode**.
-3. **Paste the rules:** open the **Rules** tab, replace everything with the contents of [`firestore.rules`](firestore.rules), and click **Publish**.
+3. **Paste the rules:** open the **Rules** tab, replace everything with the contents of [`firestore.rules`](firestore.rules), and click **Publish**. These rules let in only visitors signed in through the portal (it signs everyone in anonymously); they do not separate admins from freelancers.
 4. **Turn on sign-in:** open **Build > Authentication > Get started > Sign-in method**, then enable **Anonymous**.
 5. **Register the website:** open **Project settings** (gear icon) > **Your apps**, click the **</>** (Web) icon, and register an app (no hosting needed). Copy the `firebaseConfig` values it shows.
 6. **Add the settings to the portal:** open [`firebase-config.js`](firebase-config.js) in this repository and replace `null` with your settings, following the example in the file. Commit the change.

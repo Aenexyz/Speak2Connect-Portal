@@ -1,18 +1,8 @@
 rules_version = '2';
-
-// Speak n' Link Portal: Firestore security rules.
-// Paste these into Firebase console > Firestore Database > Rules, then click Publish.
-//
-// Every visitor is signed in anonymously by the portal, so these rules block
-// scripts and bots that don't go through Firebase sign-in. They do NOT separate
-// admins from freelancers: anyone who opens the portal can read and change data.
-// Add real Firebase Authentication (email/password) before storing live payroll data.
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{collection}/{doc} {
-      allow read, write: if request.auth != null
-        && collection in ['people', 'timesheets', 'rates', 'payslips', 'notes', 'settings'];
+    match /{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }
