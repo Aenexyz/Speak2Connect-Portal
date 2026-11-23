@@ -11,6 +11,9 @@ Live versions:
 **Sign-in**
 - The first screen is the freelancer sign-in: email and password. New freelancers click "Create an account" (name, email, password). An account with no password yet (e.g. created before passwords existed) takes the first password entered as its own.
 - HR and company admins sign in with a username and password through the admin link: the portal address with `#admin` at the end. Credentials are given to admins separately.
+- There are two admin types, both using the `#admin` link:
+  - **Admin** (HR / company): Available agents and Timesheets.
+  - **Payroll admin**: everything the admin has, plus Payslips (exchange rate, hourly rates, generating, editing and releasing payslips).
 - Test freelancer accounts: `test@test.com`, `test2@test.com`, `test3@test.com`, all with password `test1234`. They have one-click buttons on the sign-in page and a "Test" badge in the admin view.
 - Freelancers can change their password from the Profile tab. Admins can see each freelancer's email and password in their profile (Show / Copy), and set a new one if a freelancer forgets.
 - Client access is not included yet; for now the portal has only the freelancer and admin views.
@@ -25,7 +28,7 @@ Live versions:
 - **Submit timesheet:** client name, date, time in, time out and breaks; total hours are worked out automatically. "+ Add client hours" logs several clients on the same day. Times for different clients may overlap, and shifts can run past midnight. Each entry can be edited or removed.
 - **Payslips:** shows payslips once the admin releases them.
 
-**Admin**
+**Admin** (Payslips: payroll admin only)
 - **Notifications** for availability submissions.
 - **Available agents:** sort by hours available, by name or by most recent; search; open each agent's full profile; mark agents active or inactive.
 - **Timesheets:** weekly grid of agents by day. Click an agent to see their entries, then click an entry to view, edit or delete it.

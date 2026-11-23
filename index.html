@@ -176,7 +176,8 @@ let db=null,loaded=false;
 const S={people:{},timesheets:{},rates:{},payslips:{},notes:{},clients:{},settings:{fx:0}};
 let sess=LS.get('snl.sess',{});if(sess.admin&&sess.admin.v!==2)delete sess.admin;
 const TEST=['test','test2','test3'];
-const ADMIN_HASH='488fad9002c9d855c0d195866ae28734351200c5ccc15ad584b20af096e6eee8';
+const ADMINS={'488fad9002c9d855c0d195866ae28734351200c5ccc15ad584b20af096e6eee8':'admin','d68db0c14ea4dd9990406b14a4c7cd5339201d6ff64a70b99d18d3b2859e187e':'payroll'};
+const isPayroll=()=>!!(sess.admin&&sess.admin.role==='payroll');
 async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 const saveSess=()=>LS.set('snl.sess',sess);
 const wk0=wkStart(today());
@@ -225,7 +226,8 @@ function render(){sync();const v=view();lastView=v;const app=$('#app');
  if(v==='loading'){app.innerHTML=`<div class="login"><p class="mute">Loading your workspace…</p></div>`;return}
  if(v==='login'||v==='adminLogin'){app.innerHTML=loginHTML(v);return}
  if(v==='onboard'){if(!Object.keys(ui.ob).length){const p=S.people[sess.fid];ui.ob=LS.get('snl.ob.'+sess.fid,null)||{name:p.name}}app.innerHTML=header(v)+`<main id="ob"></main>`;renderOnboard();return}
- const tabs=v==='freelancer'?[['profile','Profile'],['timesheet','Submit timesheet'],['payslips','Payslips']]:v==='admin'?[['agents','Available agents'],['timesheets','Timesheets'],['payslips','Payslips']]:[];
+ const tabs=v==='freelancer'?[['profile','Profile'],['timesheet','Submit timesheet'],['payslips','Payslips']]:v==='admin'?[['agents','Available agents'],['timesheets','Timesheets'],...(isPayroll()?[['payslips','Payslips']]:[])]:[];
+ if(v==='admin'&&ui.atab==='payslips'&&!isPayroll())ui.atab='agents';
  const cur=v==='admin'?ui.atab:ui.ftab;
  let body='';
  if(v==='freelancer'){body=cur==='profile'?`<div id="fProfile"></div><div id="availForm"></div>`:cur==='timesheet'?`<div id="tsForm"></div><div id="tsList"></div><datalist id="clientList"></datalist>`:`<div id="fPay"></div>`}
@@ -239,7 +241,7 @@ function render(){sync();const v=view();lastView=v;const app=$('#app');
  if(v==='freelancer'&&cur==='timesheet')renderTsForm();
  renderData()}
 function header(v){const p=v==='admin'?{name:sess.admin.name}:S.people[v==='client'?sess.cid:sess.fid]||{};
- const label=v==='admin'?'Admin':v==='client'?'Client':'Freelancer';
+ const label=v==='admin'?(isPayroll()?'Payroll admin':'Admin'):v==='client'?'Client':'Freelancer';
  const unread=Object.values(S.notes).filter(n=>!n.read).length;
  return `<header class="top"><div class="brand"><img src="${EMB}" alt=""><div><b>Speak2Connect</b><span>PORTAL</span></div></div>
  <div class="who"><span class="pill">${label} · ${esc(p.name||'')}</span>
@@ -257,7 +259,7 @@ function loginHTML(v){
   :r==='admin'?`<label class="f"><span class="req">Username</span><input name="user" required autocomplete="username" autocapitalize="off" spellcheck="false"></label><label class="f"><span class="req">Password</span><input name="pass" type="password" required autocomplete="current-password"></label><p class="small" id="loginErr" role="alert" style="color:#c42b1c;margin:0"></p>`:'';
  return `
  <div class="login"><div class="lcard"><img class="logo" src="${LOGO}" alt="Speak2Connect Portal">
- ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR and company admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Sign in to your freelancer account for your profile, timesheets and payslips.</p></div>`}
+ ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR, company and payroll admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Sign in to your freelancer account for your profile, timesheets and payslips.</p></div>`}
  ${f?`<form class="stackf" id="loginForm" data-role="${r}" data-mode="${cr?'create':'signin'}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':cr?'Create account':'Sign in'}</button>
  ${r==='admin'?'':cr?`<p class="small mute" style="text-align:center">Already have an account? <button type="button" class="btn link" data-act="loginMode" data-k="signin">Sign in</button></p>`:`<p class="small mute" style="text-align:center">New freelancer? <button type="button" class="btn link" data-act="loginMode" data-k="create">Create an account</button><br>Forgot your password? Ask your admin.</p>`}</form>`:''}
  ${r==='freelancer'&&!cr?`<div class="row" style="justify-content:center"><span class="small mute">Test accounts (password test1234):</span>${TEST.map(t=>`<button class="btn sm ghost" data-act="testLogin" data-k="${t}">${t}</button>`).join('')}</div>`:''}
@@ -450,8 +452,8 @@ function slipText(p){const t=psTot(p);return[`SPEAK2CONNECT PORTAL — PAYSLIP (
 
 async function login(form){const fd=Object.fromEntries(new FormData(form));const role=form.dataset.role;const email=String(fd.email||'').trim().toLowerCase();
  if(role==='admin'){const err=$('#loginErr');let h='';try{h=await sha256(String(fd.user||'').trim().toLowerCase()+':'+String(fd.pass||''))}catch(e){err.textContent='This browser cannot check the password. Open the portal over https.';return}
-  if(h!==ADMIN_HASH){err.textContent='Incorrect username or password.';form.pass.value='';form.pass.focus();return}
-  sess.admin={name:String(fd.user).trim(),v:2};sess.mode='admin';ui.adminLogin=false;saveSess();if(location.hash==='#admin')history.replaceState(null,'',location.pathname+location.search);render();return}
+  const role=ADMINS[h];if(!role){err.textContent='Incorrect username or password.';form.pass.value='';form.pass.focus();return}
+  sess.admin={name:String(fd.user).trim(),v:2,role};ui.atab='agents';sess.mode='admin';ui.adminLogin=false;saveSess();if(location.hash==='#admin')history.replaceState(null,'',location.pathname+location.search);render();return}
  const err=$('#loginErr');const fail=m=>{err.textContent=m;return};const pass=String(fd.pass||'');const create=form.dataset.mode==='create';
  if(!/^\S+@\S+\.\S+$/.test(email))return fail('Enter a valid email address.');
  if(pass.length<6)return fail('Passwords are at least 6 characters.');
@@ -538,7 +540,7 @@ const ACT={
  note:async d=>{const n=S.notes[d.id];ui.bellOpen=false;if(!n.read)await W(()=>col('notes').doc(d.id).update({read:true}));if(view()==='admin'&&ui.atab!=='agents'){ui.atab='agents';render()}else renderData();if(n.pid&&S.people[n.pid])ACT.openAgent({id:n.pid})},
  readAll:async()=>{for(const[id,n]of Object.entries(S.notes))if(!n.read)await W(()=>col('notes').doc(id).update({read:true}));renderData()},
  saveFx:async()=>{const fx=Math.round(+$('#fxIn').value*10000)/10000;if(!(fx>0)){toast('Enter a valid exchange rate.');return}await W(()=>db.doc('settings/app').set({...S.settings,fx,fxUpdated:Date.now()}),`Exchange rate saved: $1 = ${php(fx)}`)},
- generate:async()=>{if(ui.busy)return;const w=ui.pweek,end=addD(w,6);const fx=+S.settings.fx||0;const by={};
+ generate:async()=>{if(ui.busy||!isPayroll())return;const w=ui.pweek,end=addD(w,6);const fx=+S.settings.fx||0;const by={};
   entries().filter(e=>inWeek(e,w)).forEach(e=>{const m=by[e.pid]=by[e.pid]||{};const k=ckey(e.client);(m[k]=m[k]||{client:e.client,hours:0}).hours+=+e.hours||0});
   const pids=Object.keys(by);if(!pids.length){toast('No timesheets in this cutoff yet.');return}ui.busy=true;renderData();let made=0,kept=0;
   for(const pid of pids){const id=`${pid}__${w}`;const ex=S.payslips[id];if(ex&&ex.status==='released'){kept++;continue}
@@ -598,8 +600,8 @@ function derive(){const mg=pre=>Object.assign({},...Object.keys(R).filter(k=>k.s
  S.settings={fx:0,...((R.settings||{}).app||{})};
  for(const k of Object.keys(R))if(k.startsWith('ph:')){const id=k.slice(3);const d=R[k][id];PH[id]=d&&d.photo||''}}
 function needs(){const n={};if(!db)return n;
- if(sess.mode==='admin'&&sess.admin){n.people=()=>col('people');n.rates=()=>col('rates');n.notes=()=>col('notes').orderBy('at','desc').limit(40);n.settings=()=>db.doc('settings/app');
-  n['ts:'+ui.aweek]=()=>col('timesheets').where('wk','==',ui.aweek);n['ts:'+ui.pweek]=()=>col('timesheets').where('wk','==',ui.pweek);n['ps:'+ui.pweek]=()=>col('payslips').where('weekStart','==',ui.pweek)}
+ if(sess.mode==='admin'&&sess.admin){n.people=()=>col('people');if(isPayroll())n.rates=()=>col('rates');n.notes=()=>col('notes').orderBy('at','desc').limit(40);n.settings=()=>db.doc('settings/app');
+  n['ts:'+ui.aweek]=()=>col('timesheets').where('wk','==',ui.aweek);if(isPayroll()){n['ts:'+ui.pweek]=()=>col('timesheets').where('wk','==',ui.pweek);n['ps:'+ui.pweek]=()=>col('payslips').where('weekStart','==',ui.pweek)}}
  else if(sess.mode==='freelancer'&&sess.fid){const f=sess.fid;n['me:'+f]=()=>col('people').doc(f);n['ph:'+f]=()=>col('photos').doc(f);n.clients=()=>col('clients');
   n['ts:'+f+'|'+ui.fweek]=()=>col('timesheets').where('pw','==',f+'|'+ui.fweek);n['ps:'+f]=()=>col('payslips').where('pid','==',f)}
  return n}
