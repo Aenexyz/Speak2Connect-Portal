@@ -53,7 +53,11 @@ main>div{display:grid;gap:20px}main>div:empty{display:none}main{max-width:1240px
 .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.row.sp{justify-content:space-between}
 .grid2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px}
 .hero{grid-template-columns:auto minmax(0,1fr) auto;align-items:center}
-.avatar{width:64px;height:64px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:800 22px Montserrat}
+.avatar{width:64px;height:64px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:800 22px Montserrat;object-fit:cover;flex:none}
+.avatar.lg{width:88px;height:88px;font-size:28px}.avatar.sm{width:44px;height:44px;font-size:15px}
+.agn{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:12px;align-items:start}.agn>*{grid-column:2}.agn>.avatar{grid-column:1;grid-row:1/span 4}
+.notice{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;justify-content:space-between;background:var(--accBg);border:1px solid var(--acc);border-radius:14px;padding:14px 18px}.notice b{color:var(--accInk)}
+.sr{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .lede{font-size:17px}
 .chip{display:inline-block;padding:4px 10px;border-radius:99px;background:var(--panel);border:1px solid var(--line);font-size:13px;margin:0 6px 6px 0}
 .dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;margin:0}.dl dt{color:var(--mute);font-size:14px}.dl dd{margin:0;font-weight:500}
@@ -114,7 +118,7 @@ pre,.scroll{overflow-x:auto}
 .tsrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.tsrow .cl,.tsrow .bf,.pastrow .cl{grid-column:1/-1}.pastrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 @media(max-width:600px){.hero{grid-template-columns:auto minmax(0,1fr)}.hero .btn{grid-column:1/-1}.week{grid-template-columns:repeat(4,minmax(0,1fr))}
 .top{position:static}table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mute)}.stack td:empty{display:none}.stack tr{border-bottom:1px solid var(--line)}}
-</style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</style><script src="firebase-config.js"></script><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
 </head>
 <body>
 <div id="dbnote"></div>
@@ -178,7 +182,7 @@ const ui={loginRole:sess.lastRole||'',ftab:'profile',atab:'agents',fweek:wk0,awe
 const toast=m=>{const t=$('#toast');t.innerHTML=`<div class="toast" role="status">${esc(m)}</div>`;clearTimeout(toast.h);toast.h=setTimeout(()=>t.innerHTML='',3200)};
 const dbNote=m=>{$('#dbnote').innerHTML=m?`<div class="dbnote">${esc(m)}</div>`:''};
 async function W(fn,ok){if(!db){toast('Storage is not available here, so nothing was saved.');return false}
- try{await fn();if(ok)toast(ok);return true}catch(e){toast(e&&e.code==='invalid_argument'?'You do not have permission to save here.':(e&&e.code==='quota_exceeded'?'Storage is full. Remove old records first.':'Could not save. Please try again.'));return false}}
+ try{await fn();if(ok)toast(ok);return true}catch(e){toast(e&&(e.code==='invalid_argument'||e.code==='permission-denied')?'You do not have permission to save here.':(e&&e.code==='quota_exceeded'?'Storage is full. Remove old records first.':'Could not save. Please try again.'));return false}}
 const col=c=>db.collection(c);
 const people=r=>Object.entries(S.people).filter(([,p])=>p.role===r).map(([id,p])=>({id,...p}));
 const entries=()=>Object.entries(S.timesheets).map(([id,e])=>({id,...e}));
@@ -192,6 +196,9 @@ const mDur=x=>{if(!x.start)return'';const e=x.current||!x.end?ds(new Date()).sli
 const mRange=x=>`${fmtM(x.start)} – ${x.current?'present':fmtM(x.end)||'present'}`;
 const cleanPast=xs=>(Array.isArray(xs)?xs:[]).filter(x=>x&&String(x.name||'').trim()).map(x=>({name:String(x.name).trim(),start:x.start||'',end:x.current?'':(x.end||''),current:!!x.current}));
 const newPast=()=>({name:'',start:'',end:'',current:false});
+const PHOTO=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+const avatarHTML=(p,cls='')=>p&&typeof p.photo==='string'&&PHOTO.test(p.photo)?`<img class="avatar ${cls}" src="${p.photo}" alt="${esc(p.name)}">`:`<div class="avatar ${cls}" aria-hidden="true">${esc(initials(p&&p.name))}</div>`;
+const hasPhoto=p=>!!(p&&typeof p.photo==='string'&&PHOTO.test(p.photo));
 const low=s=>String(s).split(' ').map(w=>/[A-Z].*[A-Z]/.test(w)?w:w.toLowerCase()).join(' ');
 const article=w=>/^[aeiou]/i.test(w)?'an':'a';
 function makeSummary(a){const role=(a.role==='Other'?a.roleOther:ROLES[a.role])||a.roleOther||'remote professional';const y=+a.years||0;const ind=list(a.industries).map(low);
@@ -294,12 +301,12 @@ const chipsOf=s=>list(s).map(x=>`<span class="chip">${esc(x)}</span>`).join('');
 const vocLink=u=>u&&VOC.test(u)?`<a class="btn sm ghost" href="${esc(u)}" target="_blank" rel="noopener">▶ Play voice introduction</a>`:'<span class="mute small">No voice recording yet</span>';
 function weekStrip(av){return`<div class="week">${DAYS.map(d=>{const x=av&&av.days&&av.days[d];return`<div class="day${x&&x.on?' on':''}"><b>${d}</b>${x&&x.on?`${fmtT(x.start)}<br>${fmtT(x.end)}`:'Off'}</div>`}).join('')}</div>`}
 function portfolioHTML(p,admin){const a=p.profile||{};
- return`<section class="card hero"><div class="avatar">${esc(initials(p.name))}</div><div><h2>${esc(p.name)}</h2><p class="mute">${esc(p.headline||'')}</p>${admin?`<p class="small mute">${esc(p.email)}${a.phone?' · '+esc(a.phone):''}</p>`:''}</div>${admin?'':`<button class="btn ghost" data-act="editPortfolio">Edit portfolio</button>`}</section>
+ return`<section class="card hero">${avatarHTML(p,'lg')}<div><h2>${esc(p.name)}</h2><p class="mute">${esc(p.headline||'')}</p>${admin?`<p class="small mute">${esc(p.email)}${a.phone?' · '+esc(a.phone):''}</p>`:''}</div>${admin?'':`<div class="row" style="justify-content:flex-end"><input type="file" id="photoIn" class="sr" tabindex="-1" aria-hidden="true" accept="image/jpeg,image/png,image/webp,image/*"><button class="btn ghost" data-act="pickPhoto">${hasPhoto(p)?'Change photo':'Upload photo'}</button>${hasPhoto(p)?`<button class="btn link danger" data-act="rmPhoto">Remove photo</button>`:''}<button class="btn ghost" data-act="editPortfolio">Edit portfolio</button></div>`}</section>
  <div class="grid2"><section class="card"><h3>Portfolio summary</h3><p class="lede">${esc(p.summary||'')}</p>
  ${a.skills?`<div><p class="small mute">Skills</p>${chipsOf(a.skills)}</div>`:''}${a.tools?`<div><p class="small mute">Tools</p>${chipsOf(a.tools)}</div>`:''}<div>${vocLink(p.vocaroo)}</div></section>
  <section class="card"><h3>Details</h3>${cleanPast(a.pastList).length?`<div><p class="small mute">Past clients</p><ul class="past">${cleanPast(a.pastList).map(x=>`<li><b>${esc(x.name)}</b><span class="small mute">${esc(mRange(x))}${mDur(x)?' · '+mDur(x):''}</span></li>`).join('')}</ul></div>`:''}<dl class="dl">${[['Location',a.location],['Experience',a.years!=null&&a.years!==''?`${a.years} years`:''],['Industries',a.industries],['Languages',a.languages],['Past clients',cleanPast(a.pastList).length?'':a.past],['Education',a.education],['Preferred shift',a.shift],['Internet',a.speed?`${a.speed} Mbps${a.backup?' + backup':''}`:'']].filter(x=>x[1]).map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl></section></div>`}
 function fProfileHTML(p){if(!p)return'';const av=p.availability;
- return portfolioHTML(p,false)+`<section class="card"><div class="row sp"><div><h3>Availability to work</h3><p class="mute small">${av?`Sent to admin ${ago(av.submittedAt)} · ${esc(av.tz)}`:'Tell the team when you can take shifts.'}</p></div>
+ return (hasPhoto(p)?'':`<div class="notice" role="status"><div><b>Recommended: add a professional-looking photo</b><p class="small" style="margin:2px 0 0">A clear, well-lit headshot with a plain background helps clients and admins recognise you.</p></div><button class="btn acc sm" data-act="pickPhoto">Upload photo</button></div>`)+portfolioHTML(p,false)+`<section class="card"><div class="row sp"><div><h3>Availability to work</h3><p class="mute small">${av?`Sent to admin ${ago(av.submittedAt)} · ${esc(av.tz)}`:'Tell the team when you can take shifts.'}</p></div>
  ${ui.availOpen?'':`<button class="btn acc" data-act="openAvail">${av?'Update availability':'Add availability'}</button>`}</div>
  ${av?`<div class="row" style="gap:24px"><div><span class="big">${hrs(av.hours)}</span><p class="small mute">available per week</p></div>${av.notes?`<p class="mute" style="flex:1 1 240px">“${esc(av.notes)}”</p>`:''}</div>${weekStrip(av)}`:`<div class="empty">No availability submitted yet.</div>`}</section>`}
 function renderAvail(){const el=$('#availForm');if(!el)return;if(!ui.availOpen){el.innerHTML='';return}const a=ui.av;
@@ -350,7 +357,7 @@ function agentsHTML(){const q=ui.q.trim().toLowerCase();let fs=people('freelance
  xs.sort(ui.sort==='name'?(a,b)=>(a.name||'').localeCompare(b.name||''):ui.sort==='recent'?(a,b)=>(b.availability.submittedAt||0)-(a.availability.submittedAt||0):(a,b)=>(b.availability.hours||0)-(a.availability.hours||0)||(a.name||'').localeCompare(b.name||''));
  const max=Math.max(1,...xs.map(p=>p.availability.hours||0));const total=xs.reduce((s,p)=>s+(p.availability.hours||0),0);
  return`<div class="stats"><div class="stat"><span>Agents available</span><b>${xs.length}</b></div><div class="stat"><span>Hours offered per week</span><b>${hrs(total)}</b></div><div class="stat"><span>Not yet submitted</span><b>${none.length}</b></div></div>
- ${xs.length?xs.map(p=>{const av=p.availability;return`<div class="agent"><div><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.status==='inactive'?' <span class="badge">Inactive</span>':''}${p.test?' <span class="badge">Test</span>':''}<p class="small mute">${esc(p.headline||'')}</p><p class="small mute">${esc(av.tz)} · sent ${ago(av.submittedAt)}</p></div>
+ ${xs.length?xs.map(p=>{const av=p.availability;return`<div class="agent"><div class="agn">${avatarHTML(p,'sm')}<div class="row" style="gap:6px"><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left;min-height:0" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.status==='inactive'?'<span class="badge">Inactive</span>':''}${p.test?'<span class="badge">Test</span>':''}</div><p class="small mute">${esc(p.headline||'')}</p><p class="small mute">${esc(av.tz)} · sent ${ago(av.submittedAt)}</p></div>
  <div class="wkc">${weekStrip(av)}</div><div><b>${hrs(av.hours)}</b><span class="small mute"> / week</span><div class="bar"><i style="width:${(av.hours||0)/max*100}%"></i></div></div><button class="btn sm ghost" data-act="openAgent" data-id="${p.id}">Profile</button></div>`}).join(''):`<div class="empty">${withAv.length?'No agents match your search.':'No freelancer has submitted availability yet.'}</div>`}
  ${none.length?`<div><p class="small mute">Haven't submitted availability: ${none.map(p=>esc(p.name)).join(', ')}</p></div>`:''}`}
 function adminTsHTML(){const w=ui.aweek;const es=entries().filter(e=>inWeek(e,w));const fs=people('freelancer');const by={};es.forEach(e=>(by[e.pid]=by[e.pid]||[]).push(e));
@@ -445,6 +452,8 @@ const ACT={
  signout:()=>{const v=view();if(v==='admin'){delete sess.admin;ui.adminLogin=false}else if(v==='client')delete sess.cid;else delete sess.fid;sess.mode='';ui.ts=null;ui.availOpen=false;closeModal();saveSess();render()},
  tab:d=>{if(view()==='admin')ui.atab=d.k;else ui.ftab=d.k;ui.confirm='';render()},
  obNext:()=>{const err=obValidate();if(err){$('#obErr').textContent=err;return}ui.step++;if(ui.step>=STEPS.length){ui.ob.vocaroo=ui.ob.vocaroo.trim();ui.ob.summary=makeSummary(ui.ob);ui.ob.headline=makeHead(ui.ob)}renderOnboard();scrollTo(0,0)},
+ pickPhoto:()=>{$('#photoIn')?.click()},
+ rmPhoto:async()=>{await W(()=>col('people').doc(sess.fid).update({photo:'',photoUpdatedAt:Date.now()}),'Photo removed')},
  pastAdd:()=>{ui.ob.pastList=(ui.ob.pastList||[]).concat([newPast()]);renderOnboard();const r=document.querySelectorAll('.pastrow');r[r.length-1]?.querySelector('input')?.focus()},
  pastRm:d=>{ui.ob.pastList.splice(+d.i,1);renderOnboard()},
  obBack:()=>{ui.step=Math.max(0,ui.step-1);renderOnboard()},
@@ -515,19 +524,33 @@ function onField(e){const t=e.target,ds=t.dataset;
  if(ds.ts){if(ds.ts==='date')ui.ts.date=t.value;else{const[i,k]=ds.ts.split('.');ui.ts.rows[+i][k]=t.value;const o=$('#tsTot-'+i);if(o)o.textContent=hrs(rowHours(ui.ts.rows[+i]))}const g=$('#tsGrand');if(g)g.textContent=hrs(ui.ts.rows.reduce((s,r)=>s+rowHours(r),0));return}
  if(ds.pe){setPath(ui.edit,ds.pe,t.value);const tt=psTot(ui.edit);tt.lines.forEach((l,i)=>{const c=$('#peL'+i);if(c)c.textContent=usd(l.usd)});const n=$('#peNet .big');if(n)n.textContent=php(tt.net);return}
  if(t.id==='agQ'){ui.q=t.value;paintAgents()}}
+async function uploadPhoto(f){if(!/^image\//.test(f.type)){toast('Choose an image file (JPG, PNG or WebP).');return}if(f.size>15e6){toast('That image is over 15 MB. Choose a smaller one.');return}
+ toast('Uploading photo…');let url;try{url=URL.createObjectURL(f);const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
+  const side=Math.min(img.naturalWidth,img.naturalHeight);if(side<80){toast('That photo is too small. Use one at least 200 pixels wide.');return}
+  const c=document.createElement('canvas');c.width=c.height=320;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,320,320);
+  g.drawImage(img,(img.naturalWidth-side)/2,(img.naturalHeight-side)/2*0.6,side,side,0,0,320,320);
+  let q=.86,data=c.toDataURL('image/jpeg',q);while(data.length>120000&&q>.4){q-=.12;data=c.toDataURL('image/jpeg',q)}
+  await W(()=>col('people').doc(sess.fid).update({photo:data,photoUpdatedAt:Date.now()}),'Profile photo saved')}
+ catch(e){toast('Could not read that image. Try a JPG or PNG.')}finally{if(url)URL.revokeObjectURL(url)}}
 function paintAgents(){const el=$('#agList');if(el)el.innerHTML=agentsHTML()}
 document.addEventListener('input',onField);
 document.addEventListener('change',async e=>{const t=e.target;
  if(t.dataset.ob||t.dataset.av||t.dataset.ts||t.dataset.pe){onField(e);return}
+ if(t.id==='photoIn'&&t.files&&t.files[0]){const f=t.files[0];t.value='';t.blur();uploadPhoto(f);return}
  if(t.id==='agSort'){ui.sort=t.value;paintAgents()}if(t.id==='agInact'){ui.inactive=t.checked;paintAgents()}
  if(t.dataset.rate){const v=t.value===''?null:r2(t.value);const k=t.dataset.rate;if(v==null){await W(()=>col('rates').doc(k).delete(),'Rate cleared')}else if(v>=0){await W(()=>col('rates').doc(k).set({pid:t.dataset.pid,client:t.dataset.client,rate:v,updatedAt:Date.now()}),`Rate saved: ${usd(v)}/h for ${t.dataset.client}`)}}});
 window.addEventListener('hashchange',render);
 document.addEventListener('click',e=>{if(ui.bellOpen&&!e.target.closest('.notes,[data-act=bell]')){ui.bellOpen=false;renderData()}});
 
 render();
+const FBV='10.12.2';
+const loadJS=src=>new Promise((ok,no)=>{const el=document.createElement('script');el.src=src;el.onload=ok;el.onerror=()=>no(new Error('Could not load '+src));document.head.appendChild(el)});
+async function firebaseDB(cfg){if(!window.firebase||!window.firebase.initializeApp){for(const m of['app','auth','firestore'])await loadJS(`https://www.gstatic.com/firebasejs/${FBV}/firebase-${m}-compat.js`)}
+ const fb=window.firebase;const app=fb.apps.length?fb.app():fb.initializeApp(cfg);await app.auth().signInAnonymously();return app.firestore()}
 (async()=>{const timer=setTimeout(()=>{if(!loaded)dbNote('Still connecting to storage… Data may take a moment to appear.')},10000);
- try{db=window.claude&&window.claude.use?await window.claude.use('db'):null}catch(e){db=null}
- if(!db){clearTimeout(timer);loaded=true;dbNote('Saving is not available in this view. Open the portal on claude.ai while signed in to store data.');render();return}
+ const cfg=window.SNL_FIREBASE_CONFIG;const useFb=!!(cfg&&cfg.apiKey&&cfg.projectId);
+ try{db=useFb?await firebaseDB(cfg):(window.claude&&window.claude.use?await window.claude.use('db'):null)}catch(e){db=null;console.error(e)}
+ if(!db){clearTimeout(timer);loaded=true;dbNote(useFb?'Could not connect to Firebase. Check the settings in firebase-config.js, and that Firestore and Anonymous sign-in are turned on in your Firebase project.':window.claude?'Saving is not available in this view. Open the portal on claude.ai while signed in to store data.':'Saving is not set up on this copy. Add your Firebase project settings to firebase-config.js (see the README).');render();return}
  const cols=['people','timesheets','rates','payslips','notes'];let first=new Set();
  const onData=()=>{if(first.size>=cols.length&&!loaded){loaded=true;clearTimeout(timer);dbNote('')}if(view()!==lastView)render();else renderData()};
  const fail=()=>{clearTimeout(timer);loaded=true;dbNote('Lost connection to storage. Reopen the portal to reconnect.');render()};

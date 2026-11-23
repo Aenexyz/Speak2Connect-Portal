@@ -17,6 +17,7 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 - Sign-up questions in five steps. The portal writes a portfolio summary and headline from the answers, and the freelancer can edit them before saving.
 - Past clients: "+ Add another client" adds as many as needed, each with a start month and an end month (or "Still working here"). The profile shows each one with how long the freelancer worked there.
 - A Vocaroo voice-recording link is required. The freelancer ticks a box to confirm the recording is 1 minute or shorter.
+- **Profile photo:** upload, change or remove a photo; it is cropped to a square and resized before saving. Until a photo is added, the Profile tab shows a notice: "Recommended: add a professional-looking photo". Admins see the photo in the agents list and profiles.
 - **Profile:** portfolio and availability to work. The freelancer picks a time zone and sets hours for each day, then submits. Submitting notifies the admin.
 - **Submit timesheet:** client name, date, time in, time out and breaks; total hours are worked out automatically. "+ Add client hours" logs several clients on the same day. Times for different clients may overlap, and shifts can run past midnight. Each entry can be edited or removed.
 - **Payslips:** shows payslips once the admin releases them.
@@ -39,16 +40,39 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 | `index.html` | The complete, self-contained portal (logo embedded) |
 | `src/portal.template.html` | The same page with the logo left as `{{EMBLEM}}` / `{{LOGO}}` placeholders, for easier editing |
 | `assets/emblem.png`, `assets/logo-full.png` | Transparent logo files |
+| `firebase-config.js` | Firebase settings for hosting outside claude.ai (`null` = use claude.ai storage) |
+| `firestore.rules` | Security rules to paste into your Firebase project |
 
 To rebuild `index.html` from the template, replace `{{EMBLEM}}` and `{{LOGO}}` with the base64 of `assets/emblem.png` and `assets/logo-full.png`.
 
-## Data storage: important
+## Data storage
 
-Right now the portal stores its data with the storage built into Claude artifacts (`claude.use("db")`). Saving works only on the live version on claude.ai. If you open `index.html` from this repository or host it elsewhere, the page loads but shows "Saving is not available in this view". To run it on your own hosting, swap the small storage layer (the `col()` / `db.doc()` calls) for a backend such as Firebase/Firestore, which uses a very similar API, or Supabase.
+The portal can save its data in two places:
 
-Also note:
+| Where the portal is opened | Where data is saved |
+| --- | --- |
+| The live version on claude.ai | Storage built into Claude (no setup) |
+| Any other host (GitHub Pages, your own website) | **Your Firebase database**, once `firebase-config.js` is filled in |
+
+Without Firebase settings, a copy hosted outside claude.ai loads but shows "Saving is not set up on this copy". The two places don't share data: records saved on claude.ai do not appear in Firebase, and records saved in Firebase do not appear on claude.ai.
+
+### Set up Firebase (free Spark plan is enough to start)
+
+1. Go to https://console.firebase.google.com, click **Create a project**, and give it a name (e.g. `speaknlink-portal`). Google Analytics is optional.
+2. **Create the database:** in the left menu, open **Build > Firestore Database > Create database**. Pick a location near your team (e.g. `asia-southeast1` for Singapore), and start in **production mode**.
+3. **Paste the rules:** open the **Rules** tab, replace everything with the contents of [`firestore.rules`](firestore.rules), and click **Publish**.
+4. **Turn on sign-in:** open **Build > Authentication > Get started > Sign-in method**, then enable **Anonymous**.
+5. **Register the website:** open **Project settings** (gear icon) > **Your apps**, click the **</>** (Web) icon, and register an app (no hosting needed). Copy the `firebaseConfig` values it shows.
+6. **Add the settings to the portal:** open [`firebase-config.js`](firebase-config.js) in this repository and replace `null` with your settings, following the example in the file. Commit the change.
+7. **Allow your website's address:** in **Authentication > Settings > Authorized domains**, add the domain where you host the portal (e.g. `aenexyz.github.io`).
+8. **Publish the site:** host the repository, for example with **GitHub Pages** (repository **Settings > Pages > Deploy from branch > main / root**). Open the site; the warning bar should be gone and data will save to Firebase.
+
+The Firebase settings in `firebase-config.js` are meant to be public; access is controlled by the Firestore rules.
+
+## Security: read before going live
+
 - Freelancer sign-in is by email only, with no passwords yet.
-- The admin password is checked in the browser against a SHA-256 hash stored in the page. That stops casual access, but anyone who can read the code can try to guess the password offline, and the stored data is not locked to admins. Change the default password, and move admin sign-in to a real server or auth service before production use.
-- Anyone who can open the portal can read all of its records.
+- The admin password is checked in the browser against a SHA-256 hash stored in the page. That stops casual access, but anyone who can read the code can try to guess the password offline. Change the default password.
+- The Firestore rules only require Firebase's anonymous sign-in, which the portal does automatically. That blocks bots, but **anyone who opens the portal can read and change every record**, including payslips.
 
-Add real authentication and per-role access rules before you use it with live client or payroll data.
+Before you put real payroll or client data in the portal, add real accounts: Firebase Authentication with email and password for each freelancer and admin, and Firestore rules that limit each freelancer to their own records and give admins access to everything.
