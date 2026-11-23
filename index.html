@@ -246,15 +246,18 @@ const ICON={client:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
  freelancer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M19 19c0 1.5-2 2.5-5 2.5"/></svg>'};
 function loginHTML(v){
  const r=v==='adminLogin'?'admin':'freelancer';
- const f=r==='freelancer'?`<label class="f"><span class="req">Full name</span><input name="name" required autocomplete="name"></label><label class="f"><span class="req">Email</span><input name="email" type="email" required autocomplete="email"></label>`
+ const cr=ui.loginMode==='create';
+ const f=r==='freelancer'?`${cr?`<label class="f"><span class="req">Full name</span><input name="name" required autocomplete="name"></label>`:''}<label class="f"><span class="req">Email</span><input name="email" type="email" required autocomplete="email"></label>
+  <label class="f"><span class="req">${cr?'Create a password':'Password'}</span><input name="pass" type="password" required minlength="6" autocomplete="${cr?'new-password':'current-password'}">${cr?'<small>At least 6 characters.</small>':''}</label>
+  ${cr?`<label class="f"><span class="req">Confirm password</span><input name="pass2" type="password" required minlength="6" autocomplete="new-password"></label>`:''}<p class="small" id="loginErr" role="alert" style="color:#c42b1c;margin:0"></p>`
   :r==='client'?`<label class="f"><span class="req">Company name</span><input name="company" required autocomplete="organization"></label><label class="f"><span class="req">Your name</span><input name="name" required autocomplete="name"></label><label class="f"><span class="req">Work email</span><input name="email" type="email" required autocomplete="email"></label>`
   :r==='admin'?`<label class="f"><span class="req">Username</span><input name="user" required autocomplete="username" autocapitalize="off" spellcheck="false"></label><label class="f"><span class="req">Password</span><input name="pass" type="password" required autocomplete="current-password"></label><p class="small" id="loginErr" role="alert" style="color:#c42b1c;margin:0"></p>`:'';
  return `${r==='admin'?'':`<div class="corner"><button class="btn sm ghost" data-act="toggle">Switch to admin view</button></div>`}
  <div class="login"><div class="lcard"><img class="logo" src="${LOGO}" alt="Speak n' Link Portal">
  ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR and company admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Sign in to your freelancer account for your profile, timesheets and payslips.</p></div>`}
- ${f?`<form class="stackf" id="loginForm" data-role="${r}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':'Continue'}</button>
- ${r==='admin'?'':'<p class="small mute">Prototype sign-in: you are recognised by your email. Passwords come later.</p>'}</form>`:''}
- ${r==='freelancer'?`<div class="row" style="justify-content:center"><span class="small mute">Test accounts:</span>${TEST.map(t=>`<button class="btn sm ghost" data-act="testLogin" data-k="${t}">${t}</button>`).join('')}</div>`:''}
+ ${f?`<form class="stackf" id="loginForm" data-role="${r}" data-mode="${cr?'create':'signin'}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':cr?'Create account':'Sign in'}</button>
+ ${r==='admin'?'':cr?`<p class="small mute" style="text-align:center">Already have an account? <button type="button" class="btn link" data-act="loginMode" data-k="signin">Sign in</button></p>`:`<p class="small mute" style="text-align:center">New freelancer? <button type="button" class="btn link" data-act="loginMode" data-k="create">Create an account</button><br>Forgot your password? Ask your admin.</p>`}</form>`:''}
+ ${r==='freelancer'&&!cr?`<div class="row" style="justify-content:center"><span class="small mute">Test accounts (password test1234):</span>${TEST.map(t=>`<button class="btn sm ghost" data-act="testLogin" data-k="${t}">${t}</button>`).join('')}</div>`:''}
  ${r==='admin'?`<button class="btn link" data-act="leaveAdmin">Back to freelancer sign-in</button>`:`<p class="small mute">HR or company admin? Use your admin sign-in link.</p>`}
  </div></div>`}
 
@@ -301,7 +304,7 @@ const chipsOf=s=>list(s).map(x=>`<span class="chip">${esc(x)}</span>`).join('');
 const vocLink=u=>u&&VOC.test(u)?`<a class="btn sm ghost" href="${esc(u)}" target="_blank" rel="noopener">▶ Play voice introduction</a>`:'<span class="mute small">No voice recording yet</span>';
 function weekStrip(av){return`<div class="week">${DAYS.map(d=>{const x=av&&av.days&&av.days[d];return`<div class="day${x&&x.on?' on':''}"><b>${d}</b>${x&&x.on?`${fmtT(x.start)}<br>${fmtT(x.end)}`:'Off'}</div>`}).join('')}</div>`}
 function portfolioHTML(p,admin){const a=p.profile||{};
- return`<section class="card hero">${avatarHTML(p,'lg')}<div><h2>${esc(p.name)}</h2><p class="mute">${esc(p.headline||'')}</p>${admin?`<p class="small mute">${esc(p.email)}${a.phone?' · '+esc(a.phone):''}</p>`:''}</div>${admin?'':`<div class="row" style="justify-content:flex-end"><input type="file" id="photoIn" class="sr" tabindex="-1" aria-hidden="true" accept="image/jpeg,image/png,image/webp,image/*"><button class="btn ghost" data-act="pickPhoto">${hasPhoto(p)?'Change photo':'Upload photo'}</button>${hasPhoto(p)?`<button class="btn link danger" data-act="rmPhoto">Remove photo</button>`:''}<button class="btn ghost" data-act="editPortfolio">Edit portfolio</button></div>`}</section>
+ return`<section class="card hero">${avatarHTML(p,'lg')}<div><h2>${esc(p.name)}</h2><p class="mute">${esc(p.headline||'')}</p>${admin?`<p class="small mute">${esc(p.email)}${a.phone?' · '+esc(a.phone):''}</p>`:''}</div>${admin?'':`<div class="row" style="justify-content:flex-end"><input type="file" id="photoIn" class="sr" tabindex="-1" aria-hidden="true" accept="image/jpeg,image/png,image/webp,image/*"><button class="btn ghost" data-act="pickPhoto">${hasPhoto(p)?'Change photo':'Upload photo'}</button>${hasPhoto(p)?`<button class="btn link danger" data-act="rmPhoto">Remove photo</button>`:''}<button class="btn ghost" data-act="editPortfolio">Edit portfolio</button><button class="btn link" data-act="changePw">Change password</button></div>`}</section>
  <div class="grid2"><section class="card"><h3>Portfolio summary</h3><p class="lede">${esc(p.summary||'')}</p>
  ${a.skills?`<div><p class="small mute">Skills</p>${chipsOf(a.skills)}</div>`:''}${a.tools?`<div><p class="small mute">Tools</p>${chipsOf(a.tools)}</div>`:''}<div>${vocLink(p.vocaroo)}</div></section>
  <section class="card"><h3>Details</h3>${cleanPast(a.pastList).length?`<div><p class="small mute">Past clients</p><ul class="past">${cleanPast(a.pastList).map(x=>`<li><b>${esc(x.name)}</b><span class="small mute">${esc(mRange(x))}${mDur(x)?' · '+mDur(x):''}</span></li>`).join('')}</ul></div>`:''}<dl class="dl">${[['Location',a.location],['Experience',a.years!=null&&a.years!==''?`${a.years} years`:''],['Industries',a.industries],['Languages',a.languages],['Past clients',cleanPast(a.pastList).length?'':a.past],['Education',a.education],['Preferred shift',a.shift],['Internet',a.speed?`${a.speed} Mbps${a.backup?' + backup':''}`:'']].filter(x=>x[1]).map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl></section></div>`}
@@ -359,7 +362,7 @@ function agentsHTML(){const q=ui.q.trim().toLowerCase();let fs=people('freelance
  return`<div class="stats"><div class="stat"><span>Agents available</span><b>${xs.length}</b></div><div class="stat"><span>Hours offered per week</span><b>${hrs(total)}</b></div><div class="stat"><span>Not yet submitted</span><b>${none.length}</b></div></div>
  ${xs.length?xs.map(p=>{const av=p.availability;return`<div class="agent"><div class="agn">${avatarHTML(p,'sm')}<div class="row" style="gap:6px"><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left;min-height:0" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.status==='inactive'?'<span class="badge">Inactive</span>':''}${p.test?'<span class="badge">Test</span>':''}</div><p class="small mute">${esc(p.headline||'')}</p><p class="small mute">${esc(av.tz)} · sent ${ago(av.submittedAt)}</p></div>
  <div class="wkc">${weekStrip(av)}</div><div><b>${hrs(av.hours)}</b><span class="small mute"> / week</span><div class="bar"><i style="width:${(av.hours||0)/max*100}%"></i></div></div><button class="btn sm ghost" data-act="openAgent" data-id="${p.id}">Profile</button></div>`}).join(''):`<div class="empty">${withAv.length?'No agents match your search.':'No freelancer has submitted availability yet.'}</div>`}
- ${none.length?`<div><p class="small mute">Haven't submitted availability: ${none.map(p=>esc(p.name)).join(', ')}</p></div>`:''}`}
+ ${none.length?`<div><p class="small mute">Haven't submitted availability: ${none.map(p=>`<button class="btn sm link" style="padding:0 4px" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>`).join(' ')}</p></div>`:''}`}
 function adminTsHTML(){const w=ui.aweek;const es=entries().filter(e=>inWeek(e,w));const fs=people('freelancer');const by={};es.forEach(e=>(by[e.pid]=by[e.pid]||[]).push(e));
  const ids=Object.keys(by).sort((a,b)=>(S.people[a]?.name||'').localeCompare(S.people[b]?.name||''));const tot=es.reduce((s,e)=>s+(+e.hours||0),0);
  const missing=fs.filter(p=>!by[p.id]&&p.status!=='inactive');
@@ -404,8 +407,13 @@ function modalBody(){const m=ui.modal;if(!m)return'';
  if(m.type==='slip'){const p=S.payslips[m.id];if(!p)return'<p class="mute">This payslip was removed.</p>';const adm=view()==='admin';
   return slipHTML(p)+`<div class="row sp" style="margin-top:14px"><button class="btn ghost" data-act="copySlip" data-id="${m.id}">Copy as text</button>${adm?`<div class="row"><button class="btn ghost" data-act="editSlip" data-id="${m.id}">Edit</button><button class="btn acc" data-act="release" data-id="${m.id}">${p.status==='released'?'Unrelease':'Release to freelancer'}</button></div>`:''}</div>`}
  if(m.type==='agent'){const p=S.people[m.id];if(!p)return'';const av=p.availability;
-  return`<div style="display:grid;gap:16px">${portfolioHTML(p,true)}<section class="card"><h3>Availability</h3>${av?`<p><b>${hrs(av.hours)}</b> per week · ${esc(av.tz)} · sent ${ago(av.submittedAt)}</p>${weekStrip(av)}${av.notes?`<p class="mute">“${esc(av.notes)}”</p>`:''}`:'<p class="mute">Not submitted yet.</p>'}</section>
+  const sh=ui.showPw&&ui.showPw[m.id];
+  return`<div style="display:grid;gap:16px">${portfolioHTML(p,true)}<section class="card soft"><div class="row sp"><h3>Sign-in details</h3><span class="small mute">Visible to admins only. Share privately if the freelancer forgets.</span></div>
+  <dl class="dl"><dt>Email</dt><dd>${esc(p.email)}</dd><dt>Password</dt><dd><span class="row" style="gap:6px"><code style="font-size:16px">${p.password?(sh?esc(p.password):'••••••••'):'<span class="mute">Not set yet (set on first sign-in)</span>'}</code>${p.password?`<button class="btn sm link" data-act="showPw" data-id="${m.id}">${sh?'Hide':'Show'}</button><button class="btn sm link" data-act="copyPw" data-id="${m.id}">Copy</button>`:''}</span>${p.passwordSetAt?`<span class="small mute">Last changed ${ago(p.passwordSetAt)}</span>`:''}</dd></dl>
+  <div class="row"><input id="newPw" type="text" autocomplete="off" placeholder="New password (6+ characters)" style="flex:1 1 220px;width:auto"><button class="btn sm" data-act="setPw" data-id="${m.id}">Set new password</button></div></section>
+  <section class="card"><h3>Availability</h3>${av?`<p><b>${hrs(av.hours)}</b> per week · ${esc(av.tz)} · sent ${ago(av.submittedAt)}</p>${weekStrip(av)}${av.notes?`<p class="mute">“${esc(av.notes)}”</p>`:''}`:'<p class="mute">Not submitted yet.</p>'}</section>
   <div class="row sp"><span class="small mute">Status: ${p.status==='inactive'?'Inactive':'Active'}</span><button class="btn ghost" data-act="toggleActive" data-id="${m.id}">${p.status==='inactive'?'Mark active':'Mark inactive'}</button></div></div>`}
+ if(m.type==='pw'){const me=S.people[sess.fid]||{};return`<form class="stackf">${me.password?'<label class="f">Current password<input id="pwOld" type="password" autocomplete="current-password"></label>':'<input id="pwOld" type="hidden" value="">'}<label class="f">New password<input id="pwNew" type="password" minlength="6" autocomplete="new-password"><small>At least 6 characters.</small></label><label class="f">Confirm new password<input id="pwNew2" type="password" autocomplete="new-password"></label><p class="small" id="pwErr" role="alert" style="color:#c42b1c;margin:0"></p><div class="row sp"><button type="button" class="btn ghost" data-act="closeModal">Cancel</button><button type="button" class="btn acc" data-act="savePw">Change password</button></div></form>`}
  if(m.type==='entry'){const e=S.timesheets[m.id];if(!e)return'<p class="mute">This entry was removed.</p>';const c=ui.confirm==='ae:'+m.id;
   return`<dl class="dl" style="margin-bottom:16px"><dt>Agent</dt><dd>${esc(e.pname)}</dd><dt>Submitted</dt><dd>${e.createdAt?new Date(e.createdAt).toLocaleString('en-US'):'—'}${e.updatedAt&&e.updatedAt!==e.createdAt?` · edited ${ago(e.updatedAt)}`:''}</dd></dl>
   <div class="fields" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"><label class="f">Client name<input id="eClient" value="${esc(e.client)}"></label><label class="f">Date<input id="eDate" type="date" value="${e.date}"></label>
@@ -432,11 +440,19 @@ async function login(form){const fd=Object.fromEntries(new FormData(form));const
  if(role==='admin'){const err=$('#loginErr');let h='';try{h=await sha256(String(fd.user||'').trim().toLowerCase()+':'+String(fd.pass||''))}catch(e){err.textContent='This browser cannot check the password. Open the portal over https.';return}
   if(h!==ADMIN_HASH){err.textContent='Incorrect username or password.';form.pass.value='';form.pass.focus();return}
   sess.admin={name:String(fd.user).trim(),v:2};sess.mode='admin';ui.adminLogin=false;saveSess();if(location.hash==='#admin')history.replaceState(null,'',location.pathname+location.search);render();return}
- const id=(role==='client'?'c_':'f_')+slug(email);sess.lastRole=role;
- let ex=S.people[id];if(!ex&&db){try{const d=await col('people').doc(id).get();if(d.exists)ex=d.data()}catch(e){}}
- if(!ex){const doc={role,name:String(fd.name).trim(),email,createdAt:Date.now(),status:'active',onboarded:role==='client'};if(role==='client')doc.company=String(fd.company).trim();if(TEST.some(t=>email===t+'@test.com'))doc.test=true;
-  const ok=await W(()=>col('people').doc(id).set(doc));if(!ok)return;S.people[id]=doc}
- if(role==='client'){sess.cid=id;sess.mode='client'}else{sess.fid=id;sess.mode='freelancer';ui.ob=LS.get('snl.ob.'+id,null)||{name:String(fd.name).trim()};ui.step=0;ui.editing=false}
+ const err=$('#loginErr');const fail=m=>{err.textContent=m;return};const pass=String(fd.pass||'');const create=form.dataset.mode==='create';
+ if(!/^\S+@\S+\.\S+$/.test(email))return fail('Enter a valid email address.');
+ if(pass.length<6)return fail('Passwords are at least 6 characters.');
+ if(!db)return fail('Saving is not available here, so you cannot sign in yet.');
+ const id='f_'+slug(email);let ex=S.people[id];if(!ex){try{const d=await col('people').doc(id).get();if(d.exists)ex=d.data()}catch(e){}}
+ if(create){if(ex)return fail('An account with this email already exists. Sign in instead, or ask your admin for your password.');
+  const name=String(fd.name||'').trim();if(!name)return fail('Enter your full name.');if(pass!==String(fd.pass2||''))return fail('The two passwords do not match.');
+  const doc={role:'freelancer',name,email,password:pass,createdAt:Date.now(),status:'active',onboarded:false};if(TEST.some(t=>email===t+'@test.com'))doc.test=true;
+  if(!await W(()=>col('people').doc(id).set(doc)))return;ex=doc}
+ else{if(!ex||ex.role!=='freelancer')return fail('No freelancer account uses this email. Check the spelling or create an account.');
+  if(!ex.password){if(!await W(()=>col('people').doc(id).update({password:pass,passwordSetAt:Date.now()}),'Password set. Use it next time you sign in.'))return}
+  else if(ex.password!==pass){form.pass.value='';form.pass.focus();return fail('Incorrect email or password. Forgot it? Ask your admin.')}}
+ ui.loginMode='signin';sess.fid=id;sess.mode='freelancer';ui.ob=LS.get('snl.ob.'+id,null)||{name:ex.name};ui.step=0;ui.editing=false
  saveSess();render()}
 function obValidate(){const st=STEPS[ui.step];for(const q of st.f){const v=ui.ob[q.k];if(q.req&&(v==null||v===''||v===false)){return`Please fill in “${q.l}”.`}}
  if(st.f.some(q=>q.k==='roleOther')&&ui.ob.role==='Other'&&!String(ui.ob.roleOther||'').trim())return'Please describe your role.';
@@ -446,7 +462,15 @@ function setPath(o,path,v){const ks=path.split('.');let x=o;for(let i=0;i<ks.len
 
 const ACT={
  pick:d=>{ui.loginRole=d.k;render();setTimeout(()=>$('#loginForm input')?.focus(),0)},
- testLogin:d=>{const f=$('#loginForm');if(!f)return;f.name.value=d.k;f.email.value=d.k+'@test.com';login(f)},
+ testLogin:d=>{const f=$('#loginForm');if(!f)return;f.email.value=d.k+'@test.com';f.pass.value='test1234';login(f)},
+ loginMode:d=>{ui.loginMode=d.k;render();setTimeout(()=>$('#loginForm input')?.focus(),0)},
+ showPw:d=>{ui.showPw=ui.showPw||{};ui.showPw[d.id]=!ui.showPw[d.id];paint('modalBody',modalBody())},
+ copyPw:async d=>{const p=S.people[d.id];try{await navigator.clipboard.writeText(`Speak n' Link Portal\nEmail: ${p.email}\nPassword: ${p.password||''}`);toast('Sign-in details copied')}catch(e){toast('Copy was blocked by the browser.')}},
+ setPw:async d=>{const i=$('#newPw');const v=i?String(i.value):'';if(v.length<6){toast('Passwords are at least 6 characters.');return}if(await W(()=>col('people').doc(d.id).update({password:v,passwordSetAt:Date.now()}),'Password updated. Share it with the freelancer.')){ui.showPw=ui.showPw||{};ui.showPw[d.id]=true;i.value='';i.blur();paint('modalBody',modalBody())}},
+ changePw:()=>openModal({type:'pw',title:'Change password'}),
+ savePw:async()=>{const a=String($('#pwOld').value),b=String($('#pwNew').value),c=String($('#pwNew2').value);const me=S.people[sess.fid];const e=$('#pwErr');
+  if(me.password&&a!==me.password){e.textContent='Your current password is incorrect.';return}if(b.length<6){e.textContent='New password must be at least 6 characters.';return}if(b!==c){e.textContent='The new passwords do not match.';return}
+  if(await W(()=>col('people').doc(sess.fid).update({password:b,passwordSetAt:Date.now()}),'Password changed'))closeModal()},
  leaveAdmin:()=>{ui.adminLogin=false;history.replaceState(null,'',location.pathname+location.search);render()},
  toggle:()=>{const v=view();if(v==='admin'){sess.mode=sess.fid?'freelancer':''}else if(!sess.admin){ui.adminLogin=true}else{sess.mode='admin'}ui.bellOpen=false;closeModal();saveSess();render()},
  signout:()=>{const v=view();if(v==='admin'){delete sess.admin;ui.adminLogin=false}else if(v==='client')delete sess.cid;else delete sess.fid;sess.mode='';ui.ts=null;ui.availOpen=false;closeModal();saveSess();render()},

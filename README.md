@@ -7,9 +7,10 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 ## Features
 
 **Sign-in**
-- The first screen is the freelancer sign-in.
+- The first screen is the freelancer sign-in: email and password. New freelancers click "Create an account" (name, email, password). An account with no password yet (e.g. created before passwords existed) takes the first password entered as its own.
 - HR and company admins sign in with a username and password, either through the admin link (`#admin`) or with the "Switch to admin view" button. Credentials are given to admins separately.
-- Test freelancer accounts: `test` / `test@test.com`, `test2` / `test2@test.com`, `test3` / `test3@test.com`. They have one-click buttons on the sign-in page and a "Test" badge in the admin view.
+- Test freelancer accounts: `test@test.com`, `test2@test.com`, `test3@test.com`, all with password `test1234`. They have one-click buttons on the sign-in page and a "Test" badge in the admin view.
+- Freelancers can change their password from the Profile tab. Admins can see each freelancer's email and password in their profile (Show / Copy), and set a new one if a freelancer forgets.
 - Client access is not included yet; for now the portal has only the freelancer and admin views.
 - A header button switches between the freelancer and admin views (temporary, for testing).
 
@@ -71,7 +72,7 @@ The Firebase settings in `firebase-config.js` are meant to be public; access is 
 
 ## Security: read before going live
 
-- Freelancer sign-in is by email only, with no passwords yet.
+- **Freelancer passwords are stored as plain text** so that admins can view them. Until real accounts are added, anyone who opens the portal and knows how to inspect its data can read every freelancer's password. Tell freelancers not to reuse a password from another account.
 - The admin password is checked in the browser against a SHA-256 hash stored in the page. That stops casual access, but anyone who can read the code can try to guess the password offline. Change the default password.
 - The Firestore rules only require Firebase's anonymous sign-in, which the portal does automatically. That blocks bots, but **anyone who opens the portal can read and change every record**, including payslips.
 
