@@ -20,6 +20,7 @@ Live versions:
 **Freelancer**
 - Sign-up questions in five steps. The portal writes a portfolio summary and headline from the answers, and the freelancer can edit them before saving.
 - Past clients: "+ Add another client" adds as many as needed, each with a start month and an end month (or "Still working here"). The profile shows each one with how long the freelancer worked there.
+- Industries are picked from a multi-select dropdown (Real Estate, B2B, B2C, Sales, Mortgage, Car Rental, Digital Marketing, SaaS, Solar, Construction, Others (Specify)).
 - Optional Upwork profile link; when given, the profile shows an **UPWORK** button that opens it.
 - A Vocaroo voice-recording link is required. The freelancer ticks a box to confirm the recording is 1 minute or shorter.
 - **Profile photo:** upload, change or remove a photo; it is cropped to a square and resized before saving. Until a photo is added, the Profile tab shows a notice: "Recommended: add a professional-looking photo". Admins see the photo in the agents list and profiles.
