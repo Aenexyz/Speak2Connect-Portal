@@ -14,7 +14,6 @@ Live versions:
 - There are two admin types, both using the `#admin` link:
   - **Admin** (HR / company): Available agents and Timesheets.
   - **Payroll admin**: everything the admin has, plus Payslips (exchange rate, hourly rates, generating, editing and releasing payslips).
-- Test freelancer accounts: `test@test.com`, `test2@test.com`, `test3@test.com`, all with password `test1234`. They have one-click buttons on the sign-in page and a "Test" badge in the admin view.
 - Freelancers can change their password from the Profile tab. Admins can see each freelancer's email and password in their profile (Show / Copy), and set a new one if a freelancer forgets.
 - Client access is not included yet; for now the portal has only the freelancer and admin views.
 

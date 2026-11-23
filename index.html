@@ -175,7 +175,7 @@ const STEPS=[
 let db=null,loaded=false;
 const S={people:{},timesheets:{},rates:{},payslips:{},notes:{},clients:{},settings:{fx:0}};
 let sess=LS.get('snl.sess',{});if(sess.admin&&sess.admin.v!==2)delete sess.admin;
-const TEST=['test','test2','test3'];
+const TEST_IDS=['f_test@test.com','f_test2@test.com','f_test3@test.com'];
 const ADMINS={'488fad9002c9d855c0d195866ae28734351200c5ccc15ad584b20af096e6eee8':'admin','d68db0c14ea4dd9990406b14a4c7cd5339201d6ff64a70b99d18d3b2859e187e':'payroll'};
 const isPayroll=()=>!!(sess.admin&&sess.admin.role==='payroll');
 async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
@@ -262,8 +262,7 @@ function loginHTML(v){
  ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR, company and payroll admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Sign in to your freelancer account for your profile, timesheets and payslips.</p></div>`}
  ${f?`<form class="stackf" id="loginForm" data-role="${r}" data-mode="${cr?'create':'signin'}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':cr?'Create account':'Sign in'}</button>
  ${r==='admin'?'':cr?`<p class="small mute" style="text-align:center">Already have an account? <button type="button" class="btn link" data-act="loginMode" data-k="signin">Sign in</button></p>`:`<p class="small mute" style="text-align:center">New freelancer? <button type="button" class="btn link" data-act="loginMode" data-k="create">Create an account</button><br>Forgot your password? Ask your admin.</p>`}</form>`:''}
- ${r==='freelancer'&&!cr?`<div class="row" style="justify-content:center"><span class="small mute">Test accounts (password test1234):</span>${TEST.map(t=>`<button class="btn sm ghost" data-act="testLogin" data-k="${t}">${t}</button>`).join('')}</div>`:''}
- ${r==='admin'?`<button class="btn link" data-act="leaveAdmin">Back to freelancer sign-in</button>`:`<p class="small mute">HR, company or payroll admin? <a href="#admin">Admin sign-in</a></p>`}
+ ${r==='admin'?`<button class="btn link" data-act="leaveAdmin">Back to freelancer sign-in</button>`:`<p class="small"><a href="#admin">Admin sign-in</a></p>`}
  </div></div>`}
 
 function renderOnboard(){const el=$('#ob');if(!el)return;const a=ui.ob;
@@ -373,9 +372,9 @@ function agentsHTML(){const q=ui.q.trim().toLowerCase();let fs=people('freelance
  xs.sort(ui.sort==='name'?(a,b)=>(a.name||'').localeCompare(b.name||''):ui.sort==='recent'?(a,b)=>(b.availability.submittedAt||0)-(a.availability.submittedAt||0):(a,b)=>(b.availability.hours||0)-(a.availability.hours||0)||(a.name||'').localeCompare(b.name||''));
  const max=Math.max(1,...xs.map(p=>p.availability.hours||0));const total=xs.reduce((s,p)=>s+(p.availability.hours||0),0);
  return`<div class="stats"><div class="stat"><span>Agents available</span><b>${xs.length}</b></div><div class="stat"><span>Hours offered per week</span><b>${hrs(total)}</b></div><div class="stat"><span>Not available now</span><b>${away.length}</b></div><div class="stat"><span>Not yet submitted</span><b>${none.length}</b></div></div>
- ${xs.length?xs.map(p=>{const av=p.availability;return`<div class="agent"><div class="agn">${avatarHTML(p,'sm')}<div class="row" style="gap:6px"><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left;min-height:0" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.status==='inactive'?'<span class="badge">Inactive</span>':''}${p.test?'<span class="badge">Test</span>':''}</div><p class="small mute">${esc(p.headline||'')}</p><p class="small mute">${esc(av.tz)} · sent ${ago(av.submittedAt)}</p></div>
+ ${xs.length?xs.map(p=>{const av=p.availability;return`<div class="agent"><div class="agn">${avatarHTML(p,'sm')}<div class="row" style="gap:6px"><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left;min-height:0" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.status==='inactive'?'<span class="badge">Inactive</span>':''}</div><p class="small mute">${esc(p.headline||'')}</p><p class="small mute">${esc(av.tz)} · sent ${ago(av.submittedAt)}</p></div>
  <div class="wkc">${weekStrip(av)}</div><div><b>${hrs(av.hours)}</b><span class="small mute"> / week</span><div class="bar"><i style="width:${(av.hours||0)/max*100}%"></i></div></div><button class="btn sm ghost" data-act="openAgent" data-id="${p.id}">Profile</button></div>`}).join(''):`<div class="empty">${withAv.length?'No agents match your search.':away.length?'No agents are available right now.':'No freelancer has submitted availability yet.'}</div>`}
- ${away.length?`<div style="margin-top:18px"><h3>Not available at the moment</h3>${away.map(p=>{const av=p.availability;return`<div class="agent" style="grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto"><div class="agn">${avatarHTML(p,'sm')}<div class="row" style="gap:6px"><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left;min-height:0" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.test?'<span class="badge">Test</span>':''}</div><p class="small mute">${esc(p.headline||'')}</p></div><div><span class="badge warn">${av.backOn?`Back ${esc(fmtDY(av.backOn))}`:'Return date not set'}</span>${av.notes?`<p class="small mute">“${esc(av.notes)}”</p>`:''}<p class="small mute">Updated ${ago(av.submittedAt)}</p></div><button class="btn sm ghost" data-act="openAgent" data-id="${p.id}">Profile</button></div>`}).join('')}</div>`:''}
+ ${away.length?`<div style="margin-top:18px"><h3>Not available at the moment</h3>${away.map(p=>{const av=p.availability;return`<div class="agent" style="grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto"><div class="agn">${avatarHTML(p,'sm')}<div class="row" style="gap:6px"><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left;min-height:0" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button></div><p class="small mute">${esc(p.headline||'')}</p></div><div><span class="badge warn">${av.backOn?`Back ${esc(fmtDY(av.backOn))}`:'Return date not set'}</span>${av.notes?`<p class="small mute">“${esc(av.notes)}”</p>`:''}<p class="small mute">Updated ${ago(av.submittedAt)}</p></div><button class="btn sm ghost" data-act="openAgent" data-id="${p.id}">Profile</button></div>`}).join('')}</div>`:''}
  ${none.length?`<div><p class="small mute">Haven't submitted availability: ${none.map(p=>`<button class="btn sm link" style="padding:0 4px" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>`).join(' ')}</p></div>`:''}`}
 function adminTsHTML(){const w=ui.aweek;const es=entries().filter(e=>inWeek(e,w));const fs=people('freelancer');const by={};es.forEach(e=>(by[e.pid]=by[e.pid]||[]).push(e));
  const ids=Object.keys(by).sort((a,b)=>(S.people[a]?.name||'').localeCompare(S.people[b]?.name||''));const tot=es.reduce((s,e)=>s+(+e.hours||0),0);
@@ -461,7 +460,7 @@ async function login(form){const fd=Object.fromEntries(new FormData(form));const
  const id='f_'+slug(email);let ex=S.people[id];if(!ex){try{const d=await col('people').doc(id).get();if(d.exists)ex=d.data()}catch(e){}}
  if(create){if(ex)return fail('An account with this email already exists. Sign in instead, or ask your admin for your password.');
   const name=String(fd.name||'').trim();if(!name)return fail('Enter your full name.');if(pass!==String(fd.pass2||''))return fail('The two passwords do not match.');
-  const doc={role:'freelancer',name,email,password:pass,createdAt:Date.now(),status:'active',onboarded:false};if(TEST.some(t=>email===t+'@test.com'))doc.test=true;
+  const doc={role:'freelancer',name,email,password:pass,createdAt:Date.now(),status:'active',onboarded:false};
   if(!await W(()=>col('people').doc(id).set(doc)))return;ex=doc}
  else{if(!ex||ex.role!=='freelancer')return fail('No freelancer account uses this email. Check the spelling or create an account.');
   if(!ex.password){if(!await W(()=>col('people').doc(id).update({password:pass,passwordSetAt:Date.now()}),'Password set. Use it next time you sign in.'))return}
@@ -477,7 +476,6 @@ function setPath(o,path,v){const ks=path.split('.');let x=o;for(let i=0;i<ks.len
 
 const ACT={
  pick:d=>{ui.loginRole=d.k;render();setTimeout(()=>$('#loginForm input')?.focus(),0)},
- testLogin:d=>{const f=$('#loginForm');if(!f)return;f.email.value=d.k+'@test.com';f.pass.value='test1234';login(f)},
  loginMode:d=>{ui.loginMode=d.k;render();setTimeout(()=>$('#loginForm input')?.focus(),0)},
  showPw:d=>{ui.showPw=ui.showPw||{};ui.showPw[d.id]=!ui.showPw[d.id];paint('modalBody',modalBody())},
  copyPw:async d=>{const p=S.people[d.id];try{await navigator.clipboard.writeText(`Speak2Connect Portal\nEmail: ${p.email}\nPassword: ${p.password||''}`);toast('Sign-in details copied')}catch(e){toast('Copy was blocked by the browser.')}},
@@ -610,7 +608,7 @@ function sync(){if(!db)return;const n=needs();
  for(const k of Object.keys(SUBS))if(!n[k]){try{SUBS[k]()}catch(e){}delete SUBS[k];delete R[k];GOT.delete(k)}
  for(const[k,mk]of Object.entries(n)){if(SUBS[k])continue;const ref=mk();
   SUBS[k]=ref.onSnapshot(sn=>{const o={};if(sn.docs)sn.docs.forEach(d=>{o[d.id]=d.data()});else if(sn.exists)o[sn.id]=sn.data();R[k]=o;GOT.add(k);derive();
-   if(k==='settings'&&!S.settings.v2)migrate();onData()},e=>{console.error(k,e);GOT.add(k);dbNote(e&&e.code==='permission-denied'?'Firebase refused access. In Firebase, check that Firestore Rules say "allow read, write: if request.auth != null;" and are published, and that Anonymous sign-in is enabled.':'Lost connection to storage. Reopen the portal to reconnect.');onData()})}
+   if(k==='settings'){if(!S.settings.v2)migrate();else if(!S.settings.noTest)purgeTest()}onData()},e=>{console.error(k,e);GOT.add(k);dbNote(e&&e.code==='permission-denied'?'Firebase refused access. In Firebase, check that Firestore Rules say "allow read, write: if request.auth != null;" and are published, and that Anonymous sign-in is enabled.':'Lost connection to storage. Reopen the portal to reconnect.');onData()})}
  derive();clearTimeout(loadTimer);loadTimer=setTimeout(()=>{if(Object.keys(n).some(k=>!GOT.has(k)))dbNote('Still connecting to storage… Data may take a moment to appear.')},10000)}
 function onData(){if(Object.keys(SUBS).every(k=>GOT.has(k))){clearTimeout(loadTimer);if(/Still connecting/.test($('#dbnote').textContent))dbNote('')}if(view()!==lastView)render();else renderData()}
 const thumbOf=src=>new Promise(ok=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas');c.width=c.height=72;c.getContext('2d').drawImage(i,0,0,72,72);ok(c.toDataURL('image/jpeg',.8))};i.onerror=()=>ok('');i.src=src});
@@ -622,6 +620,13 @@ async function migrate(){if(migrating||!db)return;migrating=true;try{
   const ps=await col('people').get();
   for(const d of ps.docs){const x=d.data();if(typeof x.photo==='string'&&PHOTO.test(x.photo)){await col('photos').doc(d.id).set({photo:x.photo});await col('people').doc(d.id).update({photo:'',thumb:await thumbOf(x.photo)})}}
   await db.doc('settings/app').set({...S.settings,v2:true})}catch(e){console.error('migrate',e);migrating=false}}
+let purging=false;
+async function purgeTest(){if(purging||!db)return;purging=true;try{
+  const ids=new Set(TEST_IDS.filter(id=>S.people[id]));(await col('people').where('test','==',true).get()).docs.forEach(d=>ids.add(d.id));
+  for(const id of TEST_IDS){if(!ids.has(id)){const g=await col('people').doc(id).get();if(g.exists)ids.add(id)}}
+  for(const id of ids){for(const c of['timesheets','payslips','rates','notes']){const q=await col(c).where('pid','==',id).get();for(const d of q.docs)await col(c).doc(d.id).delete()}
+   await col('photos').doc(id).delete();await col('people').doc(id).delete()}
+  await db.doc('settings/app').set({...S.settings,noTest:true})}catch(e){console.error('purge',e);purging=false}}
 (async()=>{loaded=false;
  const cfg=window.SNL_FIREBASE_CONFIG;const useFb=!!(cfg&&cfg.apiKey&&cfg.projectId);
  try{db=useFb?await firebaseDB(cfg):(window.claude&&window.claude.use?await window.claude.use('db'):null)}catch(e){db=null;console.error(e)}
