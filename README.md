@@ -8,7 +8,7 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 
 **Sign-in**
 - The first screen is the freelancer sign-in.
-- HR and company admins sign in through the admin link (`#admin`).
+- HR and company admins sign in with a username and password, either through the admin link (`#admin`) or with the "Switch to admin view" button. Credentials are given to admins separately.
 - Client access is not included yet; for now the portal has only the freelancer and admin views.
 - A header button switches between the freelancer and admin views (temporary, for testing).
 
@@ -45,7 +45,8 @@ To rebuild `index.html` from the template, replace `{{EMBLEM}}` and `{{LOGO}}` w
 Right now the portal stores its data with the storage built into Claude artifacts (`claude.use("db")`). Saving works only on the live version on claude.ai. If you open `index.html` from this repository or host it elsewhere, the page loads but shows "Saving is not available in this view". To run it on your own hosting, swap the small storage layer (the `col()` / `db.doc()` calls) for a backend such as Firebase/Firestore, which uses a very similar API, or Supabase.
 
 Also note:
-- Sign-in is by email only; there are no passwords yet.
+- Freelancer sign-in is by email only, with no passwords yet.
+- The admin password is checked in the browser against a SHA-256 hash stored in the page. That stops casual access, but anyone who can read the code can try to guess the password offline, and the stored data is not locked to admins. Change the default password, and move admin sign-in to a real server or auth service before production use.
 - Anyone who can open the portal can read all of its records.
 
 Add real authentication and per-role access rules before you use it with live client or payroll data.

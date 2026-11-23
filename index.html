@@ -165,7 +165,9 @@ const STEPS=[
 ];
 let db=null,loaded=false;
 const S={people:{},timesheets:{},rates:{},payslips:{},notes:{},settings:{fx:0}};
-let sess=LS.get('snl.sess',{});
+let sess=LS.get('snl.sess',{});if(sess.admin&&sess.admin.v!==2)delete sess.admin;
+const ADMIN_HASH='488fad9002c9d855c0d195866ae28734351200c5ccc15ad584b20af096e6eee8';
+async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 const saveSess=()=>LS.set('snl.sess',sess);
 const wk0=wkStart(today());
 const ui={loginRole:sess.lastRole||'',ftab:'profile',atab:'agents',fweek:wk0,aweek:wk0,pweek:wk0,cweek:wk0,sort:'hours',q:'',inactive:false,
@@ -195,7 +197,7 @@ function makeSummary(a){const role=(a.role==='Other'?a.roleOther:ROLES[a.role])|
 const makeHead=a=>`${a.role==='Other'?(a.roleOther||'Remote professional'):a.role} · ${+a.years||0} yr${+a.years===1?'':'s'} experience · ${a.location}`;
 
 function view(){
- if(location.hash==='#admin'&&!sess.admin)return'adminLogin';
+ if((location.hash==='#admin'||ui.adminLogin)&&!sess.admin)return'adminLogin';
  if(sess.mode==='admin'&&sess.admin)return'admin';
  if(sess.mode==='freelancer'&&sess.fid){if(!loaded)return'loading';const p=S.people[sess.fid];if(!p)return'login';return p.onboarded&&!ui.editing?'freelancer':'onboard'}
  return'login'}
@@ -231,13 +233,13 @@ function loginHTML(v){
  const r=v==='adminLogin'?'admin':'freelancer';
  const f=r==='freelancer'?`<label class="f"><span class="req">Full name</span><input name="name" required autocomplete="name"></label><label class="f"><span class="req">Email</span><input name="email" type="email" required autocomplete="email"></label>`
   :r==='client'?`<label class="f"><span class="req">Company name</span><input name="company" required autocomplete="organization"></label><label class="f"><span class="req">Your name</span><input name="name" required autocomplete="name"></label><label class="f"><span class="req">Work email</span><input name="email" type="email" required autocomplete="email"></label>`
-  :r==='admin'?`<label class="f"><span class="req">Your name</span><input name="name" required></label><label class="f"><span class="req">Work email</span><input name="email" type="email" required></label>`:'';
- return `<div class="corner"><button class="btn sm ghost" data-act="toggle">Switch to admin view</button></div>
+  :r==='admin'?`<label class="f"><span class="req">Username</span><input name="user" required autocomplete="username" autocapitalize="off" spellcheck="false"></label><label class="f"><span class="req">Password</span><input name="pass" type="password" required autocomplete="current-password"></label><p class="small" id="loginErr" role="alert" style="color:#c42b1c;margin:0"></p>`:'';
+ return `${r==='admin'?'':`<div class="corner"><button class="btn sm ghost" data-act="toggle">Switch to admin view</button></div>`}
  <div class="login"><div class="lcard"><img class="logo" src="${LOGO}" alt="Speak n' Link Portal">
  ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR and company admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Sign in to your freelancer account for your profile, timesheets and payslips.</p></div>`}
  ${f?`<form class="stackf" id="loginForm" data-role="${r}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':'Continue'}</button>
- <p class="small mute">Prototype sign-in: you are recognised by your email. Passwords come later.</p></form>`:''}
- ${r==='admin'?`<button class="btn link" data-act="leaveAdmin">Back to client and freelancer sign-in</button>`:`<p class="small mute">HR or company admin? Use your admin sign-in link.</p>`}
+ ${r==='admin'?'':'<p class="small mute">Prototype sign-in: you are recognised by your email. Passwords come later.</p>'}</form>`:''}
+ ${r==='admin'?`<button class="btn link" data-act="leaveAdmin">Back to freelancer sign-in</button>`:`<p class="small mute">HR or company admin? Use your admin sign-in link.</p>`}
  </div></div>`}
 
 function renderOnboard(){const el=$('#ob');if(!el)return;const a=ui.ob;
@@ -404,7 +406,9 @@ function slipText(p){const t=psTot(p);return[`SPEAK N' LINK PORTAL — PAYSLIP (
  ...t.lines.map(l=>`${l.client}: ${hrs(l.hours)} × ${usd(l.rate)}/h = ${usd(l.usd)} (${php(l.usd*t.fx)})`),`Gross: ${usd(t.gUsd)} = ${php(t.gPhp)}`,...(p.adjustments||[]).map(a=>`${a.label}: ${php(a.amount)}`),`NET PAY: ${php(t.net)}`,p.notes?`Notes: ${p.notes}`:''].join('\n')}
 
 async function login(form){const fd=Object.fromEntries(new FormData(form));const role=form.dataset.role;const email=String(fd.email||'').trim().toLowerCase();
- if(role==='admin'){sess.admin={name:String(fd.name).trim(),email};sess.mode='admin';saveSess();if(location.hash==='#admin')history.replaceState(null,'',location.pathname+location.search);render();return}
+ if(role==='admin'){const err=$('#loginErr');let h='';try{h=await sha256(String(fd.user||'').trim().toLowerCase()+':'+String(fd.pass||''))}catch(e){err.textContent='This browser cannot check the password. Open the portal over https.';return}
+  if(h!==ADMIN_HASH){err.textContent='Incorrect username or password.';form.pass.value='';form.pass.focus();return}
+  sess.admin={name:String(fd.user).trim(),v:2};sess.mode='admin';ui.adminLogin=false;saveSess();if(location.hash==='#admin')history.replaceState(null,'',location.pathname+location.search);render();return}
  const id=(role==='client'?'c_':'f_')+slug(email);sess.lastRole=role;
  let ex=S.people[id];if(!ex&&db){try{const d=await col('people').doc(id).get();if(d.exists)ex=d.data()}catch(e){}}
  if(!ex){const doc={role,name:String(fd.name).trim(),email,createdAt:Date.now(),status:'active',onboarded:role==='client'};if(role==='client')doc.company=String(fd.company).trim();
@@ -418,9 +422,9 @@ function setPath(o,path,v){const ks=path.split('.');let x=o;for(let i=0;i<ks.len
 
 const ACT={
  pick:d=>{ui.loginRole=d.k;render();setTimeout(()=>$('#loginForm input')?.focus(),0)},
- leaveAdmin:()=>{history.replaceState(null,'',location.pathname+location.search);render()},
- toggle:()=>{const v=view();if(v==='admin'){sess.mode=sess.fid?'freelancer':''}else{if(!sess.admin)sess.admin={name:'Admin',email:''};sess.mode='admin'}ui.bellOpen=false;closeModal();saveSess();render()},
- signout:()=>{const v=view();if(v==='admin')delete sess.admin;else if(v==='client')delete sess.cid;else delete sess.fid;sess.mode='';ui.ts=null;ui.availOpen=false;closeModal();saveSess();render()},
+ leaveAdmin:()=>{ui.adminLogin=false;history.replaceState(null,'',location.pathname+location.search);render()},
+ toggle:()=>{const v=view();if(v==='admin'){sess.mode=sess.fid?'freelancer':''}else if(!sess.admin){ui.adminLogin=true}else{sess.mode='admin'}ui.bellOpen=false;closeModal();saveSess();render()},
+ signout:()=>{const v=view();if(v==='admin'){delete sess.admin;ui.adminLogin=false}else if(v==='client')delete sess.cid;else delete sess.fid;sess.mode='';ui.ts=null;ui.availOpen=false;closeModal();saveSess();render()},
  tab:d=>{if(view()==='admin')ui.atab=d.k;else ui.ftab=d.k;ui.confirm='';render()},
  obNext:()=>{const err=obValidate();if(err){$('#obErr').textContent=err;return}ui.step++;if(ui.step>=STEPS.length){ui.ob.vocaroo=ui.ob.vocaroo.trim();ui.ob.summary=makeSummary(ui.ob);ui.ob.headline=makeHead(ui.ob)}renderOnboard();scrollTo(0,0)},
  obBack:()=>{ui.step=Math.max(0,ui.step-1);renderOnboard()},
