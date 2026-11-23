@@ -7,8 +7,9 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 ## Features
 
 **Sign-in**
-- The first screen asks whether you are a **Client** or a **Freelancer**.
+- The first screen is the freelancer sign-in.
 - HR and company admins sign in through the admin link (`#admin`).
+- Client access is not included yet; for now the portal has only the freelancer and admin views.
 - A header button switches between the freelancer and admin views (temporary, for testing).
 
 **Freelancer**

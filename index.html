@@ -197,7 +197,6 @@ const makeHead=a=>`${a.role==='Other'?(a.roleOther||'Remote professional'):a.rol
 function view(){
  if(location.hash==='#admin'&&!sess.admin)return'adminLogin';
  if(sess.mode==='admin'&&sess.admin)return'admin';
- if(sess.mode==='client'&&sess.cid){if(!loaded)return'loading';return S.people[sess.cid]?'client':'login'}
  if(sess.mode==='freelancer'&&sess.fid){if(!loaded)return'loading';const p=S.people[sess.fid];if(!p)return'login';return p.onboarded&&!ui.editing?'freelancer':'onboard'}
  return'login'}
 let lastView='';
@@ -229,14 +228,13 @@ function header(v){const p=v==='admin'?{name:sess.admin.name}:S.people[v==='clie
 const ICON={client:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg>',
  freelancer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M19 19c0 1.5-2 2.5-5 2.5"/></svg>'};
 function loginHTML(v){
- const r=v==='adminLogin'?'admin':ui.loginRole;
+ const r=v==='adminLogin'?'admin':'freelancer';
  const f=r==='freelancer'?`<label class="f"><span class="req">Full name</span><input name="name" required autocomplete="name"></label><label class="f"><span class="req">Email</span><input name="email" type="email" required autocomplete="email"></label>`
   :r==='client'?`<label class="f"><span class="req">Company name</span><input name="company" required autocomplete="organization"></label><label class="f"><span class="req">Your name</span><input name="name" required autocomplete="name"></label><label class="f"><span class="req">Work email</span><input name="email" type="email" required autocomplete="email"></label>`
   :r==='admin'?`<label class="f"><span class="req">Your name</span><input name="name" required></label><label class="f"><span class="req">Work email</span><input name="email" type="email" required></label>`:'';
  return `<div class="corner"><button class="btn sm ghost" data-act="toggle">Switch to admin view</button></div>
  <div class="login"><div class="lcard"><img class="logo" src="${LOGO}" alt="Speak n' Link Portal">
- ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR and company admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Are you signing in as a client or a freelancer?</p></div>
- <div class="choice">${['client','freelancer'].map(k=>`<button data-act="pick" data-k="${k}" aria-pressed="${ui.loginRole===k}">${ICON[k]}${k==='client'?'Client':'Freelancer'}<span>${k==='client'?'See hours logged for your team':'Profile, timesheets and payslips'}</span></button>`).join('')}</div>`}
+ ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR and company admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Sign in to your freelancer account for your profile, timesheets and payslips.</p></div>`}
  ${f?`<form class="stackf" id="loginForm" data-role="${r}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':'Continue'}</button>
  <p class="small mute">Prototype sign-in: you are recognised by your email. Passwords come later.</p></form>`:''}
  ${r==='admin'?`<button class="btn link" data-act="leaveAdmin">Back to client and freelancer sign-in</button>`:`<p class="small mute">HR or company admin? Use your admin sign-in link.</p>`}
@@ -421,7 +419,7 @@ function setPath(o,path,v){const ks=path.split('.');let x=o;for(let i=0;i<ks.len
 const ACT={
  pick:d=>{ui.loginRole=d.k;render();setTimeout(()=>$('#loginForm input')?.focus(),0)},
  leaveAdmin:()=>{history.replaceState(null,'',location.pathname+location.search);render()},
- toggle:()=>{const v=view();if(v==='admin'){sess.mode=sess.fid?'freelancer':'';if(!sess.fid)ui.loginRole='freelancer'}else{if(!sess.admin)sess.admin={name:'Admin',email:''};sess.mode='admin'}ui.bellOpen=false;closeModal();saveSess();render()},
+ toggle:()=>{const v=view();if(v==='admin'){sess.mode=sess.fid?'freelancer':''}else{if(!sess.admin)sess.admin={name:'Admin',email:''};sess.mode='admin'}ui.bellOpen=false;closeModal();saveSess();render()},
  signout:()=>{const v=view();if(v==='admin')delete sess.admin;else if(v==='client')delete sess.cid;else delete sess.fid;sess.mode='';ui.ts=null;ui.availOpen=false;closeModal();saveSess();render()},
  tab:d=>{if(view()==='admin')ui.atab=d.k;else ui.ftab=d.k;ui.confirm='';render()},
  obNext:()=>{const err=obValidate();if(err){$('#obErr').textContent=err;return}ui.step++;if(ui.step>=STEPS.length){ui.ob.vocaroo=ui.ob.vocaroo.trim();ui.ob.summary=makeSummary(ui.ob);ui.ob.headline=makeHead(ui.ob)}renderOnboard();scrollTo(0,0)},
