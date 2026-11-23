@@ -166,6 +166,7 @@ const STEPS=[
 let db=null,loaded=false;
 const S={people:{},timesheets:{},rates:{},payslips:{},notes:{},settings:{fx:0}};
 let sess=LS.get('snl.sess',{});if(sess.admin&&sess.admin.v!==2)delete sess.admin;
+const TEST=['test','test2','test3'];
 const ADMIN_HASH='488fad9002c9d855c0d195866ae28734351200c5ccc15ad584b20af096e6eee8';
 async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 const saveSess=()=>LS.set('snl.sess',sess);
@@ -239,6 +240,7 @@ function loginHTML(v){
  ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR and company admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Sign in to your freelancer account for your profile, timesheets and payslips.</p></div>`}
  ${f?`<form class="stackf" id="loginForm" data-role="${r}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':'Continue'}</button>
  ${r==='admin'?'':'<p class="small mute">Prototype sign-in: you are recognised by your email. Passwords come later.</p>'}</form>`:''}
+ ${r==='freelancer'?`<div class="row" style="justify-content:center"><span class="small mute">Test accounts:</span>${TEST.map(t=>`<button class="btn sm ghost" data-act="testLogin" data-k="${t}">${t}</button>`).join('')}</div>`:''}
  ${r==='admin'?`<button class="btn link" data-act="leaveAdmin">Back to freelancer sign-in</button>`:`<p class="small mute">HR or company admin? Use your admin sign-in link.</p>`}
  </div></div>`}
 
@@ -334,7 +336,7 @@ function agentsHTML(){const q=ui.q.trim().toLowerCase();let fs=people('freelance
  xs.sort(ui.sort==='name'?(a,b)=>(a.name||'').localeCompare(b.name||''):ui.sort==='recent'?(a,b)=>(b.availability.submittedAt||0)-(a.availability.submittedAt||0):(a,b)=>(b.availability.hours||0)-(a.availability.hours||0)||(a.name||'').localeCompare(b.name||''));
  const max=Math.max(1,...xs.map(p=>p.availability.hours||0));const total=xs.reduce((s,p)=>s+(p.availability.hours||0),0);
  return`<div class="stats"><div class="stat"><span>Agents available</span><b>${xs.length}</b></div><div class="stat"><span>Hours offered per week</span><b>${hrs(total)}</b></div><div class="stat"><span>Not yet submitted</span><b>${none.length}</b></div></div>
- ${xs.length?xs.map(p=>{const av=p.availability;return`<div class="agent"><div><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.status==='inactive'?' <span class="badge">Inactive</span>':''}<p class="small mute">${esc(p.headline||'')}</p><p class="small mute">${esc(av.tz)} · sent ${ago(av.submittedAt)}</p></div>
+ ${xs.length?xs.map(p=>{const av=p.availability;return`<div class="agent"><div><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.status==='inactive'?' <span class="badge">Inactive</span>':''}${p.test?' <span class="badge">Test</span>':''}<p class="small mute">${esc(p.headline||'')}</p><p class="small mute">${esc(av.tz)} · sent ${ago(av.submittedAt)}</p></div>
  <div class="wkc">${weekStrip(av)}</div><div><b>${hrs(av.hours)}</b><span class="small mute"> / week</span><div class="bar"><i style="width:${(av.hours||0)/max*100}%"></i></div></div><button class="btn sm ghost" data-act="openAgent" data-id="${p.id}">Profile</button></div>`}).join(''):`<div class="empty">${withAv.length?'No agents match your search.':'No freelancer has submitted availability yet.'}</div>`}
  ${none.length?`<div><p class="small mute">Haven't submitted availability: ${none.map(p=>esc(p.name)).join(', ')}</p></div>`:''}`}
 function adminTsHTML(){const w=ui.aweek;const es=entries().filter(e=>inWeek(e,w));const fs=people('freelancer');const by={};es.forEach(e=>(by[e.pid]=by[e.pid]||[]).push(e));
@@ -411,7 +413,7 @@ async function login(form){const fd=Object.fromEntries(new FormData(form));const
   sess.admin={name:String(fd.user).trim(),v:2};sess.mode='admin';ui.adminLogin=false;saveSess();if(location.hash==='#admin')history.replaceState(null,'',location.pathname+location.search);render();return}
  const id=(role==='client'?'c_':'f_')+slug(email);sess.lastRole=role;
  let ex=S.people[id];if(!ex&&db){try{const d=await col('people').doc(id).get();if(d.exists)ex=d.data()}catch(e){}}
- if(!ex){const doc={role,name:String(fd.name).trim(),email,createdAt:Date.now(),status:'active',onboarded:role==='client'};if(role==='client')doc.company=String(fd.company).trim();
+ if(!ex){const doc={role,name:String(fd.name).trim(),email,createdAt:Date.now(),status:'active',onboarded:role==='client'};if(role==='client')doc.company=String(fd.company).trim();if(TEST.some(t=>email===t+'@test.com'))doc.test=true;
   const ok=await W(()=>col('people').doc(id).set(doc));if(!ok)return;S.people[id]=doc}
  if(role==='client'){sess.cid=id;sess.mode='client'}else{sess.fid=id;sess.mode='freelancer';ui.ob=LS.get('snl.ob.'+id,null)||{name:String(fd.name).trim()};ui.step=0;ui.editing=false}
  saveSess();render()}
@@ -422,6 +424,7 @@ function setPath(o,path,v){const ks=path.split('.');let x=o;for(let i=0;i<ks.len
 
 const ACT={
  pick:d=>{ui.loginRole=d.k;render();setTimeout(()=>$('#loginForm input')?.focus(),0)},
+ testLogin:d=>{const f=$('#loginForm');if(!f)return;f.name.value=d.k;f.email.value=d.k+'@test.com';login(f)},
  leaveAdmin:()=>{ui.adminLogin=false;history.replaceState(null,'',location.pathname+location.search);render()},
  toggle:()=>{const v=view();if(v==='admin'){sess.mode=sess.fid?'freelancer':''}else if(!sess.admin){ui.adminLogin=true}else{sess.mode='admin'}ui.bellOpen=false;closeModal();saveSess();render()},
  signout:()=>{const v=view();if(v==='admin'){delete sess.admin;ui.adminLogin=false}else if(v==='client')delete sess.cid;else delete sess.fid;sess.mode='';ui.ts=null;ui.availOpen=false;closeModal();saveSess();render()},

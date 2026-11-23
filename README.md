@@ -9,6 +9,7 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 **Sign-in**
 - The first screen is the freelancer sign-in.
 - HR and company admins sign in with a username and password, either through the admin link (`#admin`) or with the "Switch to admin view" button. Credentials are given to admins separately.
+- Test freelancer accounts: `test` / `test@test.com`, `test2` / `test2@test.com`, `test3` / `test3@test.com`. They have one-click buttons on the sign-in page and a "Test" badge in the admin view.
 - Client access is not included yet; for now the portal has only the freelancer and admin views.
 - A header button switches between the freelancer and admin views (temporary, for testing).
 
