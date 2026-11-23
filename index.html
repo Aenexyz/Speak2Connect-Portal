@@ -173,7 +173,7 @@ const STEPS=[
  {t:'Setup and voice',d:'Your workstation and a short voice introduction.',f:[{k:'speed',l:'Internet speed (Mbps)',type:'number'},{k:'backup',l:'I have backup internet or power',type:'check'},{k:'shift',l:'Preferred shift',type:'select',opts:SHIFTS},{k:'vocaroo',l:'Vocaroo link to your voice recording',req:1,ph:'https://voca.ro/…',hint:'Record a short introduction at vocaroo.com, then paste the share link here. Keep it to 1 minute or less.'},{k:'vocOk',l:'My recording is 1 minute or shorter',type:'check',req:1}]}
 ];
 let db=null,loaded=false;
-const S={people:{},timesheets:{},rates:{},payslips:{},notes:{},settings:{fx:0}};
+const S={people:{},timesheets:{},rates:{},payslips:{},notes:{},clients:{},settings:{fx:0}};
 let sess=LS.get('snl.sess',{});if(sess.admin&&sess.admin.v!==2)delete sess.admin;
 const TEST=['test','test2','test3'];
 const ADMIN_HASH='488fad9002c9d855c0d195866ae28734351200c5ccc15ad584b20af096e6eee8';
@@ -200,8 +200,9 @@ const mRange=x=>`${fmtM(x.start)} – ${x.current?'present':fmtM(x.end)||'presen
 const cleanPast=xs=>(Array.isArray(xs)?xs:[]).filter(x=>x&&String(x.name||'').trim()).map(x=>({name:String(x.name).trim(),start:x.start||'',end:x.current?'':(x.end||''),current:!!x.current}));
 const newPast=()=>({name:'',start:'',end:'',current:false});
 const PHOTO=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
-const avatarHTML=(p,cls='')=>p&&typeof p.photo==='string'&&PHOTO.test(p.photo)?`<img class="avatar ${cls}" src="${p.photo}" alt="${esc(p.name)}">`:`<div class="avatar ${cls}" aria-hidden="true">${esc(initials(p&&p.name))}</div>`;
-const hasPhoto=p=>!!(p&&typeof p.photo==='string'&&PHOTO.test(p.photo));
+const photoOf=(p,full)=>{if(!p)return'';const f=full&&p._id&&PH[p._id];if(f&&PHOTO.test(f))return f;if(typeof p.photo==='string'&&PHOTO.test(p.photo))return p.photo;if(typeof p.thumb==='string'&&PHOTO.test(p.thumb))return p.thumb;return''};
+const avatarHTML=(p,cls='')=>photoOf(p,cls==='lg')?`<img class="avatar ${cls}" src="${photoOf(p,cls==='lg')}" alt="${esc(p.name)}">`:`<div class="avatar ${cls}" aria-hidden="true">${esc(initials(p&&p.name))}</div>`;
+const hasPhoto=p=>!!photoOf(p,false);
 const low=s=>String(s).split(' ').map(w=>/[A-Z].*[A-Z]/.test(w)?w:w.toLowerCase()).join(' ');
 const article=w=>/^[aeiou]/i.test(w)?'an':'a';
 function makeSummary(a){const role=(a.role==='Other'?a.roleOther:ROLES[a.role])||a.roleOther||'remote professional';const y=+a.years||0;const ind=list(a.industries).map(low);
@@ -217,10 +218,10 @@ const makeHead=a=>`${a.role==='Other'?(a.roleOther||'Remote professional'):a.rol
 function view(){
  if((location.hash==='#admin'||ui.adminLogin)&&!sess.admin)return'adminLogin';
  if(sess.mode==='admin'&&sess.admin)return'admin';
- if(sess.mode==='freelancer'&&sess.fid){if(!loaded)return'loading';const p=S.people[sess.fid];if(!p)return'login';return p.onboarded&&!ui.editing?'freelancer':'onboard'}
+ if(sess.mode==='freelancer'&&sess.fid){if(!loaded||(db&&!GOT.has('me:'+sess.fid)))return'loading';const p=S.people[sess.fid];if(!p)return'login';return p.onboarded&&!ui.editing?'freelancer':'onboard'}
  return'login'}
 let lastView='';
-function render(){const v=view();lastView=v;const app=$('#app');
+function render(){sync();const v=view();lastView=v;const app=$('#app');
  if(v==='loading'){app.innerHTML=`<div class="login"><p class="mute">Loading your workspace…</p></div>`;return}
  if(v==='login'||v==='adminLogin'){app.innerHTML=loginHTML(v);return}
  if(v==='onboard'){if(!Object.keys(ui.ob).length){const p=S.people[sess.fid];ui.ob=LS.get('snl.ob.'+sess.fid,null)||{name:p.name}}app.innerHTML=header(v)+`<main id="ob"></main>`;renderOnboard();return}
@@ -243,7 +244,6 @@ function header(v){const p=v==='admin'?{name:sess.admin.name}:S.people[v==='clie
  return `<header class="top"><div class="brand"><img src="${EMB}" alt=""><div><b>Speak2Connect</b><span>PORTAL</span></div></div>
  <div class="who"><span class="pill">${label} · ${esc(p.name||'')}</span>
  ${v==='admin'?`<button class="btn sm bell" data-act="bell" aria-label="Notifications">Notifications<i id="bellN"${unread?'':' hidden'}>${unread}</i></button>`:''}
- <button class="btn sm acc" data-act="toggle">${v==='admin'?'Switch to freelancer view':'Switch to admin view'}</button>
  <button class="btn sm" data-act="signout">Sign out</button></div></header>`}
 const ICON={client:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg>',
  freelancer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/><path d="M19 19c0 1.5-2 2.5-5 2.5"/></svg>'};
@@ -255,7 +255,7 @@ function loginHTML(v){
   ${cr?`<label class="f"><span class="req">Confirm password</span><input name="pass2" type="password" required minlength="6" autocomplete="new-password"></label>`:''}<p class="small" id="loginErr" role="alert" style="color:#c42b1c;margin:0"></p>`
   :r==='client'?`<label class="f"><span class="req">Company name</span><input name="company" required autocomplete="organization"></label><label class="f"><span class="req">Your name</span><input name="name" required autocomplete="name"></label><label class="f"><span class="req">Work email</span><input name="email" type="email" required autocomplete="email"></label>`
   :r==='admin'?`<label class="f"><span class="req">Username</span><input name="user" required autocomplete="username" autocapitalize="off" spellcheck="false"></label><label class="f"><span class="req">Password</span><input name="pass" type="password" required autocomplete="current-password"></label><p class="small" id="loginErr" role="alert" style="color:#c42b1c;margin:0"></p>`:'';
- return `${r==='admin'?'':`<div class="corner"><button class="btn sm ghost" data-act="toggle">Switch to admin view</button></div>`}
+ return `
  <div class="login"><div class="lcard"><img class="logo" src="${LOGO}" alt="Speak2Connect Portal">
  ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR and company admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Sign in to your freelancer account for your profile, timesheets and payslips.</p></div>`}
  ${f?`<form class="stackf" id="loginForm" data-role="${r}" data-mode="${cr?'create':'signin'}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':cr?'Create account':'Sign in'}</button>
@@ -301,7 +301,7 @@ function renderData(){const v=view();if(v!==lastView){render();return}
   if(ui.ftab==='payslips')paint('fPay',fPayHTML())}
  if(v==='client')paint('cList',clientHTML());
  if(ui.modal&&ui.modal.live)paint('modalBody',modalBody())}
-function clientNames(){const m=new Map();people('client').forEach(c=>c.company&&m.set(ckey(c.company),c.company));entries().forEach(e=>e.client&&!m.has(ckey(e.client))&&m.set(ckey(e.client),e.client));return[...m.values()].sort((a,b)=>a.localeCompare(b))}
+function clientNames(){const m=new Map();Object.entries(S.clients||{}).forEach(([k,c])=>c&&c.name&&m.set(k,c.name));entries().forEach(e=>e.client&&!m.has(ckey(e.client))&&m.set(ckey(e.client),e.client));return[...m.values()].sort((a,b)=>a.localeCompare(b))}
 const wkNav=(k,lbl)=>`<div class="wknav"><button class="btn sm ghost" data-act="wk" data-k="${k}" data-d="-7" aria-label="Previous week">‹</button><b>${fmtWk(ui[k])}</b><button class="btn sm ghost" data-act="wk" data-k="${k}" data-d="7" aria-label="Next week">›</button>${ui[k]!==wk0?`<button class="btn sm link" data-act="wk" data-k="${k}" data-d="0">This week</button>`:''}${lbl?`<span class="small mute">${lbl}</span>`:''}</div>`;
 const chipsOf=s=>list(s).map(x=>`<span class="chip">${esc(x)}</span>`).join('');
 const vocLink=u=>u&&VOC.test(u)?`<a class="btn sm ghost" href="${esc(u)}" target="_blank" rel="noopener">▶ Play voice introduction</a>`:'<span class="mute small">No voice recording yet</span>';
@@ -490,7 +490,7 @@ const ACT={
  tab:d=>{if(view()==='admin')ui.atab=d.k;else ui.ftab=d.k;ui.confirm='';render()},
  obNext:()=>{const err=obValidate();if(err){$('#obErr').textContent=err;return}ui.step++;if(ui.step>=STEPS.length){ui.ob.vocaroo=ui.ob.vocaroo.trim();ui.ob.summary=makeSummary(ui.ob);ui.ob.headline=makeHead(ui.ob)}renderOnboard();scrollTo(0,0)},
  pickPhoto:()=>{$('#photoIn')?.click()},
- rmPhoto:async()=>{await W(()=>col('people').doc(sess.fid).update({photo:'',photoUpdatedAt:Date.now()}),'Photo removed')},
+ rmPhoto:async()=>{if(await W(()=>col('people').doc(sess.fid).update({photo:'',thumb:'',photoUpdatedAt:Date.now()}),'Photo removed'))await W(()=>col('photos').doc(sess.fid).delete())},
  pastAdd:()=>{ui.ob.pastList=(ui.ob.pastList||[]).concat([newPast()]);renderOnboard();const r=document.querySelectorAll('.pastrow');r[r.length-1]?.querySelector('input')?.focus()},
  pastRm:d=>{ui.ob.pastList.splice(+d.i,1);renderOnboard()},
  obBack:()=>{ui.step=Math.max(0,ui.step-1);renderOnboard()},
@@ -519,19 +519,20 @@ const ACT={
  tsSubmit:async()=>{if(ui.busy)return;const t=ui.ts;const me=S.people[sess.fid];if(!t.date){toast('Choose a date.');return}
   for(const r of t.rows){if(!r.client.trim()){toast('Enter a client name for every row.');return}if(!r.timeIn||!r.timeOut){toast('Enter time in and time out.');return}if(rowHours(r)<=0){toast(`Breaks are longer than the shift for ${r.client}.`);return}}
   ui.busy=true;let ok=true;const now=Date.now();
-  for(const r of t.rows){const doc={pid:sess.fid,pname:me.name,client:r.client.trim(),date:t.date,timeIn:r.timeIn,timeOut:r.timeOut,breakMin:rowMin(r),hours:rowHours(r),updatedAt:now};
+  for(const r of t.rows){const wkk=wkStart(t.date);const doc={pid:sess.fid,pname:me.name,client:r.client.trim(),date:t.date,wk:wkk,pw:sess.fid+'|'+wkk,timeIn:r.timeIn,timeOut:r.timeOut,breakMin:rowMin(r),hours:rowHours(r),updatedAt:now};
    if(t.editId){const old=S.timesheets[t.editId]||{};ok=await W(()=>col('timesheets').doc(t.editId).set({...old,...doc}))}else{doc.createdAt=now;ok=await W(()=>col('timesheets').add(doc))}if(!ok)break}
-  ui.busy=false;if(ok){toast(t.editId?'Entry updated':`Timesheet submitted (${t.rows.length} ${t.rows.length>1?'entries':'entry'})`);ui.fweek=wkStart(t.date);ui.ts=null;renderTsForm();renderData()}},
+  if(ok)for(const r of t.rows){const k=ckey(r.client);if(!(S.clients||{})[k])await W(()=>col('clients').doc(k).set({name:r.client.trim()}))}
+  ui.busy=false;if(ok){toast(t.editId?'Entry updated':`Timesheet submitted (${t.rows.length} ${t.rows.length>1?'entries':'entry'})`);ui.fweek=wkStart(t.date);ui.ts=null;sync();renderTsForm();renderData()}},
  tsEdit:d=>{const e=S.timesheets[d.id];const unit=e.breakMin&&e.breakMin%60===0?'hr':'min';ui.ts={date:e.date,editId:d.id,rows:[{client:e.client,timeIn:e.timeIn,timeOut:e.timeOut,brk:String(unit==='hr'?e.breakMin/60:(+e.breakMin||0)),unit}]};renderTsForm();$('#tsForm').scrollIntoView({behavior:'smooth'})},
  confirm:d=>{ui.confirm=d.k;renderData()},unconfirm:()=>{ui.confirm='';renderData()},
  tsDel:async d=>{ui.confirm='';if(await W(()=>col('timesheets').doc(d.id).delete(),'Entry removed')&&ui.ts&&ui.ts.editId===d.id){ui.ts=null;renderTsForm()}renderData()},
- wk:d=>{ui[d.k]=+d.d===0?wk0:addD(ui[d.k],+d.d);ui.confirm='';renderData()},
+ wk:d=>{ui[d.k]=+d.d===0?wk0:addD(ui[d.k],+d.d);ui.confirm='';sync();renderData()},
  expand:d=>{ui.expanded[d.id]=!ui.expanded[d.id];renderData()},
  openEntry:d=>{ui.confirm='';openModal({type:'entry',id:d.id,title:'Timesheet submission'})},
- aeSave:async d=>{const e=S.timesheets[d.id];const x={...e,client:$('#eClient').value.trim(),date:$('#eDate').value,timeIn:$('#eIn').value,timeOut:$('#eOut').value,breakMin:+$('#eBrk').value||0,updatedAt:Date.now()};x.hours=tsHours(x);
+ aeSave:async d=>{const e=S.timesheets[d.id];const x={...e,client:$('#eClient').value.trim(),date:$('#eDate').value,timeIn:$('#eIn').value,timeOut:$('#eOut').value,breakMin:+$('#eBrk').value||0,updatedAt:Date.now()};x.hours=tsHours(x);x.wk=wkStart(x.date);x.pw=x.pid+'|'+x.wk;
   if(!x.client||!x.date||x.hours<=0){toast('Check the client, date and times.');return}if(await W(()=>col('timesheets').doc(d.id).set(x),'Entry saved'))closeModal()},
  aeDel:async d=>{ui.confirm='';if(await W(()=>col('timesheets').doc(d.id).delete(),'Entry deleted'))closeModal()},
- openAgent:d=>openModal({type:'agent',id:d.id,title:'Freelancer profile',live:1}),
+ openAgent:async d=>{openModal({type:'agent',id:d.id,title:'Freelancer profile',live:1});if(db&&PH[d.id]===undefined){try{const g=await col('photos').doc(d.id).get();PH[d.id]=g.exists&&g.data().photo||''}catch(e){PH[d.id]=''}if(ui.modal&&ui.modal.id===d.id)paint('modalBody',modalBody())}},
  toggleActive:async d=>{const p=S.people[d.id];await W(()=>col('people').doc(d.id).update({status:p.status==='inactive'?'active':'inactive'}),'Status updated');paint('modalBody',modalBody())},
  bell:()=>{ui.bellOpen=!ui.bellOpen;renderData()},
  note:async d=>{const n=S.notes[d.id];ui.bellOpen=false;if(!n.read)await W(()=>col('notes').doc(d.id).update({read:true}));if(view()==='admin'&&ui.atab!=='agents'){ui.atab='agents';render()}else renderData();if(n.pid&&S.people[n.pid])ACT.openAgent({id:n.pid})},
@@ -572,7 +573,7 @@ async function uploadPhoto(f){if(!/^image\//.test(f.type)){toast('Choose an imag
   const c=document.createElement('canvas');c.width=c.height=320;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,320,320);
   g.drawImage(img,(img.naturalWidth-side)/2,(img.naturalHeight-side)/2*0.6,side,side,0,0,320,320);
   let q=.86,data=c.toDataURL('image/jpeg',q);while(data.length>120000&&q>.4){q-=.12;data=c.toDataURL('image/jpeg',q)}
-  await W(()=>col('people').doc(sess.fid).update({photo:data,photoUpdatedAt:Date.now()}),'Profile photo saved')}
+  const th=await thumbOf(data);if(await W(()=>col('photos').doc(sess.fid).set({photo:data})))await W(()=>col('people').doc(sess.fid).update({photo:'',thumb:th,photoUpdatedAt:Date.now()}),'Profile photo saved')}
  catch(e){toast('Could not read that image. Try a JPG or PNG.')}finally{if(url)URL.revokeObjectURL(url)}}
 function paintAgents(){const el=$('#agList');if(el)el.innerHTML=agentsHTML()}
 document.addEventListener('input',onField);
@@ -589,16 +590,42 @@ const FBV='10.12.2';
 const loadJS=src=>new Promise((ok,no)=>{const el=document.createElement('script');el.src=src;el.onload=ok;el.onerror=()=>no(new Error('Could not load '+src));document.head.appendChild(el)});
 async function firebaseDB(cfg){if(!window.firebase||!window.firebase.initializeApp){for(const m of['app','auth','firestore'])await loadJS(`https://www.gstatic.com/firebasejs/${FBV}/firebase-${m}-compat.js`)}
  const fb=window.firebase;const app=fb.apps.length?fb.app():fb.initializeApp(cfg);await app.auth().signInAnonymously();return app.firestore()}
-(async()=>{const timer=setTimeout(()=>{if(!loaded)dbNote('Still connecting to storage… Data may take a moment to appear.')},10000);
+// ---- data loading: subscribe only to what the signed-in person needs
+const R={},GOT=new Set(),SUBS={},PH={};
+function derive(){const mg=pre=>Object.assign({},...Object.keys(R).filter(k=>k.startsWith(pre)).map(k=>R[k]));
+ const pp=R.people||mg('me:');S.people=Object.fromEntries(Object.entries(pp).map(([id,d])=>[id,{...d,_id:id}]));
+ S.timesheets=mg('ts:');S.payslips=mg('ps:');S.rates=R.rates||{};S.notes=R.notes||{};S.clients=R.clients||{};
+ S.settings={fx:0,...((R.settings||{}).app||{})};
+ for(const k of Object.keys(R))if(k.startsWith('ph:')){const id=k.slice(3);const d=R[k][id];PH[id]=d&&d.photo||''}}
+function needs(){const n={};if(!db)return n;
+ if(sess.mode==='admin'&&sess.admin){n.people=()=>col('people');n.rates=()=>col('rates');n.notes=()=>col('notes').orderBy('at','desc').limit(40);n.settings=()=>db.doc('settings/app');
+  n['ts:'+ui.aweek]=()=>col('timesheets').where('wk','==',ui.aweek);n['ts:'+ui.pweek]=()=>col('timesheets').where('wk','==',ui.pweek);n['ps:'+ui.pweek]=()=>col('payslips').where('weekStart','==',ui.pweek)}
+ else if(sess.mode==='freelancer'&&sess.fid){const f=sess.fid;n['me:'+f]=()=>col('people').doc(f);n['ph:'+f]=()=>col('photos').doc(f);n.clients=()=>col('clients');
+  n['ts:'+f+'|'+ui.fweek]=()=>col('timesheets').where('pw','==',f+'|'+ui.fweek);n['ps:'+f]=()=>col('payslips').where('pid','==',f)}
+ return n}
+let loadTimer=null;
+function sync(){if(!db)return;const n=needs();
+ for(const k of Object.keys(SUBS))if(!n[k]){try{SUBS[k]()}catch(e){}delete SUBS[k];delete R[k];GOT.delete(k)}
+ for(const[k,mk]of Object.entries(n)){if(SUBS[k])continue;const ref=mk();
+  SUBS[k]=ref.onSnapshot(sn=>{const o={};if(sn.docs)sn.docs.forEach(d=>{o[d.id]=d.data()});else if(sn.exists)o[sn.id]=sn.data();R[k]=o;GOT.add(k);derive();
+   if(k==='settings'&&!S.settings.v2)migrate();onData()},e=>{console.error(k,e);GOT.add(k);dbNote(e&&e.code==='permission-denied'?'Firebase refused access. In Firebase, check that Firestore Rules say "allow read, write: if request.auth != null;" and are published, and that Anonymous sign-in is enabled.':'Lost connection to storage. Reopen the portal to reconnect.');onData()})}
+ derive();clearTimeout(loadTimer);loadTimer=setTimeout(()=>{if(Object.keys(n).some(k=>!GOT.has(k)))dbNote('Still connecting to storage… Data may take a moment to appear.')},10000)}
+function onData(){if(Object.keys(SUBS).every(k=>GOT.has(k))){clearTimeout(loadTimer);if(/Still connecting/.test($('#dbnote').textContent))dbNote('')}if(view()!==lastView)render();else renderData()}
+const thumbOf=src=>new Promise(ok=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas');c.width=c.height=72;c.getContext('2d').drawImage(i,0,0,72,72);ok(c.toDataURL('image/jpeg',.8))};i.onerror=()=>ok('');i.src=src});
+let migrating=false;
+async function migrate(){if(migrating||!db)return;migrating=true;try{
+  const ts=await col('timesheets').get();const cl={};
+  for(const d of ts.docs){const x=d.data();if(x.client)cl[ckey(x.client)]=x.client;if(x.date&&(!x.wk||!x.pw)){const w=wkStart(x.date);await col('timesheets').doc(d.id).update({wk:w,pw:x.pid+'|'+w})}}
+  for(const[k,name]of Object.entries(cl))await col('clients').doc(k).set({name});
+  const ps=await col('people').get();
+  for(const d of ps.docs){const x=d.data();if(typeof x.photo==='string'&&PHOTO.test(x.photo)){await col('photos').doc(d.id).set({photo:x.photo});await col('people').doc(d.id).update({photo:'',thumb:await thumbOf(x.photo)})}}
+  await db.doc('settings/app').set({...S.settings,v2:true})}catch(e){console.error('migrate',e);migrating=false}}
+(async()=>{loaded=false;
  const cfg=window.SNL_FIREBASE_CONFIG;const useFb=!!(cfg&&cfg.apiKey&&cfg.projectId);
  try{db=useFb?await firebaseDB(cfg):(window.claude&&window.claude.use?await window.claude.use('db'):null)}catch(e){db=null;console.error(e)}
- if(!db){clearTimeout(timer);loaded=true;dbNote(useFb?'Could not connect to Firebase. Check the settings in firebase-config.js, and that Firestore and Anonymous sign-in are turned on in your Firebase project.':window.claude?'Saving is not available in this view. Open the portal on claude.ai while signed in to store data.':'Saving is not set up on this copy. Add your Firebase project settings to firebase-config.js (see the README).');render();return}
- const cols=['people','timesheets','rates','payslips','notes'];let first=new Set();
- const onData=()=>{if(first.size>=cols.length&&!loaded){loaded=true;clearTimeout(timer);dbNote('')}if(view()!==lastView)render();else renderData()};
- const fail=e=>{clearTimeout(timer);loaded=true;dbNote(e&&e.code==='permission-denied'?'Firebase refused access. In Firebase, check that Firestore Rules say "allow read, write: if request.auth != null;" and are published, and that Anonymous sign-in is enabled.':'Lost connection to storage. Reopen the portal to reconnect.');render()};
- cols.forEach(c=>col(c).onSnapshot(s=>{const o={};s.docs.forEach(d=>{o[d.id]=d.data()});S[c]=o;first.add(c);onData()},fail));
- db.doc('settings/app').onSnapshot(d=>{S.settings={fx:0,...(d.exists?d.data():{})};onData()},()=>{});
-})();
+ loaded=true;
+ if(!db){dbNote(useFb?'Could not connect to Firebase. Check the settings in firebase-config.js, and that Firestore and Anonymous sign-in are turned on in your Firebase project.':window.claude?'Saving is not available in this view. Open the portal on claude.ai while signed in to store data.':'Saving is not set up on this copy. Add your Firebase project settings to firebase-config.js (see the README).');render();return}
+ render()})();
 }
 </script>
 </body>

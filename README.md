@@ -10,11 +10,10 @@ Live versions:
 
 **Sign-in**
 - The first screen is the freelancer sign-in: email and password. New freelancers click "Create an account" (name, email, password). An account with no password yet (e.g. created before passwords existed) takes the first password entered as its own.
-- HR and company admins sign in with a username and password, either through the admin link (`#admin`) or with the "Switch to admin view" button. Credentials are given to admins separately.
+- HR and company admins sign in with a username and password through the admin link: the portal address with `#admin` at the end. Credentials are given to admins separately.
 - Test freelancer accounts: `test@test.com`, `test2@test.com`, `test3@test.com`, all with password `test1234`. They have one-click buttons on the sign-in page and a "Test" badge in the admin view.
 - Freelancers can change their password from the Profile tab. Admins can see each freelancer's email and password in their profile (Show / Copy), and set a new one if a freelancer forgets.
 - Client access is not included yet; for now the portal has only the freelancer and admin views.
-- A header button switches between the freelancer and admin views (temporary, for testing).
 
 **Freelancer**
 - Sign-up questions in five steps. The portal writes a portfolio summary and headline from the answers, and the freelancer can edit them before saving.
@@ -50,6 +49,8 @@ Live versions:
 To rebuild `index.html` from the template, replace `{{EMBLEM}}`, `{{LOGO}}` and `{{UPWORK}}` with the base64 of `assets/emblem.png`, `assets/logo-banner.jpg` and `assets/upwork.png`.
 
 ## Data storage
+
+To stay inside Firebase's free daily limits, each screen loads only what it needs: a freelancer loads their own profile, the week of timesheets they are viewing and their own payslips; an admin loads the freelancer list, the rates, the latest 40 notifications and the selected week's timesheets and payslips. Full-size profile photos are stored separately and loaded only where shown. The first time an admin opens the portal after this change, it updates older records once (adds week fields to timesheets, moves photos, builds the client list).
 
 The portal can save its data in two places:
 
