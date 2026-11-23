@@ -1,6 +1,6 @@
-# Speak n' Link Portal
+# Speak2Connect Portal
 
-An agency portal for Speak n' Link: freelancer profiles and availability, daily timesheets, and weekly payslips, with an admin view for HR.
+An agency portal for Speak2Connect: freelancer profiles and availability, daily timesheets, and weekly payslips, with an admin view for HR.
 
 Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: add `#admin` to the end of the link)
 
@@ -19,7 +19,7 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 - Past clients: "+ Add another client" adds as many as needed, each with a start month and an end month (or "Still working here"). The profile shows each one with how long the freelancer worked there.
 - A Vocaroo voice-recording link is required. The freelancer ticks a box to confirm the recording is 1 minute or shorter.
 - **Profile photo:** upload, change or remove a photo; it is cropped to a square and resized before saving. Until a photo is added, the Profile tab shows a notice: "Recommended: add a professional-looking photo". Admins see the photo in the agents list and profiles.
-- **Profile:** portfolio and availability to work. The freelancer picks a time zone and sets hours for each day, then submits. Submitting notifies the admin.
+- **Profile:** portfolio and availability to work. Instead of a weekly schedule, a freelancer can choose **Not available at the moment**, with an optional return date and note; the admin is notified and sees them in a separate "Not available at the moment" list. The freelancer picks a time zone and sets hours for each day, then submits. Submitting notifies the admin.
 - **Submit timesheet:** client name, date, time in, time out and breaks; total hours are worked out automatically. "+ Add client hours" logs several clients on the same day. Times for different clients may overlap, and shifts can run past midnight. Each entry can be edited or removed.
 - **Payslips:** shows payslips once the admin releases them.
 
@@ -40,11 +40,11 @@ Live version: https://claude.ai/artifact/BPGbvoA8oDKDyHGJUeJC2E (admin sign-in: 
 | --- | --- |
 | `index.html` | The complete, self-contained portal (logo embedded) |
 | `src/portal.template.html` | The same page with the logo left as `{{EMBLEM}}` / `{{LOGO}}` placeholders, for easier editing |
-| `assets/emblem.png`, `assets/logo-full.png` | Transparent logo files |
+| `assets/emblem.png`, `assets/logo-banner.jpg` | Round emblem (header, payslips) and full banner logo (sign-in page) |
 | `firebase-config.js` | Firebase settings for hosting outside claude.ai (`null` = use claude.ai storage) |
 | `firestore.rules` | Security rules to paste into your Firebase project |
 
-To rebuild `index.html` from the template, replace `{{EMBLEM}}` and `{{LOGO}}` with the base64 of `assets/emblem.png` and `assets/logo-full.png`.
+To rebuild `index.html` from the template, replace `{{EMBLEM}}` and `{{LOGO}}` with the base64 of `assets/emblem.png` and `assets/logo-banner.jpg`.
 
 ## Data storage
 

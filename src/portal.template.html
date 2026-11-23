@@ -3,22 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Speak n' Link Portal</title>
+<title>Speak2Connect Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* VOICE: a calm, exact operations desk for an agency, nothing decorative.
    IDEA: the headset switchboard: one black console band, clean white call sheets beneath.
    PICTURE: the working portal itself; the logo leads the sign-in screen.
-   COLOUR and TYPE: the logo's black and white, one signal orange; Montserrat (the wordmark's lettering) + Inter.
+   COLOUR and TYPE: the logo's navy and glowing teal, one teal accent; Montserrat (the wordmark's lettering) + Inter.
    LAYOUT: black console header with tabs, cards and tables in a 1240px column, stacking under 600px. */
 :root{color-scheme:light dark;
---bg:light-dark(#ffffff,#111214);--ink:light-dark(#0b0b0c,#f1f1ee);--mute:light-dark(#5b5e64,#a3a6ac);
---line:light-dark(#e3e3df,#2b2d31);--panel:light-dark(#f5f5f2,#1a1b1e);--acc:#ff4f1a;--accInk:light-dark(#b9340a,#ff8a5c);
---accBg:light-dark(#fff0ea,#3a1d12);--ok:light-dark(#17703f,#6fd79c);--okBg:light-dark(#e7f6ed,#13301f);
---warn:light-dark(#8a5a00,#f2c26b);--warnBg:light-dark(#fff6df,#352a12);--logoF:none;--btnInk:light-dark(#fff,#0b0b0c)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark;--logoF:invert(1)}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--logoF:invert(1)}}
+--bg:light-dark(#ffffff,#0a0f1e);--ink:light-dark(#0b1533,#eef3ff);--mute:light-dark(#56607a,#9fabc7);
+--line:light-dark(#e1e6ef,#243050);--panel:light-dark(#f3f6fb,#121a30);--acc:#16c7b5;--accInk:light-dark(#0a7a70,#5fe8d8);
+--accBg:light-dark(#e4faf7,#0d2c30);--ok:light-dark(#17703f,#6fd79c);--okBg:light-dark(#e7f6ed,#13301f);
+--warn:light-dark(#8a5a00,#f2c26b);--warnBg:light-dark(#fff6df,#352a12);--logoF:none;--btnInk:light-dark(#fff,#0b1533)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
 h1,h2,h3{font-family:Montserrat,Inter,sans-serif;line-height:1.1;margin:0;text-wrap:balance}
@@ -34,16 +33,16 @@ label.f,div.f{display:grid;gap:6px;font-weight:600;font-size:14px}label.f small,
 .req::after{content:" *";color:var(--accInk)}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:10px;border:1.5px solid var(--ink);background:var(--ink);color:var(--btnInk);font-weight:600;cursor:pointer;white-space:nowrap}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}.btn.ghost:hover{border-color:var(--ink)}
-.btn.acc{background:var(--acc);border-color:var(--acc);color:#fff}.btn.sm{min-height:36px;padding:0 12px;font-size:14px}
+.btn.acc{background:var(--acc);border-color:var(--acc);color:#061229}.btn.sm{min-height:36px;padding:0 12px;font-size:14px}
 .btn.link{border:0;background:none;color:var(--accInk);padding:0 6px;min-height:36px}.btn.danger{color:#c42b1c}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
-.top{background:#0b0b0c;color:#f4f4f1;padding:12px max(5vw,16px);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
-.brand{display:flex;align-items:center;gap:12px}.brand img{width:44px;height:44px;filter:invert(1)}
-.brand b{font:800 18px Montserrat,sans-serif;display:block;line-height:1}.brand span{font:600 11px Montserrat,sans-serif;letter-spacing:.3em;color:#b9b9b4}
-.who{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.who .btn{border-color:#3a3b3f;background:transparent;color:#f4f4f1}.who .btn:hover{border-color:#f4f4f1}
-.who .btn.acc{background:var(--acc);border-color:var(--acc)}
-.pill{font-size:13px;padding:6px 12px;border-radius:99px;background:#232427;color:#d8d8d3;white-space:nowrap}
-.bell{position:relative}.bell i{position:absolute;top:-6px;right:-6px;background:var(--acc);color:#fff;font:700 11px Inter;border-radius:99px;padding:2px 6px;font-style:normal}
+.top{background:linear-gradient(90deg,#050a1c,#0c1a45);color:#f2f6ff;padding:12px max(5vw,16px);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:12px}.brand img{width:46px;height:46px;border-radius:50%;box-shadow:0 0 18px rgba(22,199,181,.35)}
+.brand b{font:800 18px Montserrat,sans-serif;display:block;line-height:1}.brand span{font:600 11px Montserrat,sans-serif;letter-spacing:.3em;color:#5fe8d8}
+.who{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.who .btn{border-color:#2a3866;background:transparent;color:#f2f6ff}.who .btn:hover{border-color:#5fe8d8}
+.who .btn.acc{background:var(--acc);border-color:var(--acc);color:#061229}
+.pill{font-size:13px;padding:6px 12px;border-radius:99px;background:#16224d;color:#cfe0ff;white-space:nowrap}
+.bell{position:relative}.bell i{position:absolute;top:-6px;right:-6px;background:var(--acc);color:#061229;font:700 11px Inter;border-radius:99px;padding:2px 6px;font-style:normal}
 .tabs{display:flex;gap:4px;padding:0 max(5vw,16px);border-bottom:1px solid var(--line);overflow-x:auto;background:var(--bg)}
 .tabs button{border:0;background:none;padding:14px 14px 12px;font-weight:600;color:var(--mute);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;min-height:48px}
 .tabs button[aria-selected=true]{color:var(--ink);border-color:var(--acc)}
@@ -85,7 +84,7 @@ tr.click{cursor:pointer}tr.click:hover td{background:var(--panel)}tr.sub>td{back
 .agent:last-child{border:0}
 .login{min-height:100vh;display:grid;place-items:center;padding:64px 16px 32px}
 .lcard{width:min(560px,100%);display:grid;gap:20px;text-align:center}
-.lcard .logo{width:min(320px,80%);margin:0 auto;filter:var(--logoF)}
+.lcard .logo{width:100%;max-width:560px;margin:0 auto;border-radius:18px;box-shadow:0 18px 50px rgba(5,10,28,.25)}
 .choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .choice button{border:1.5px solid var(--line);border-radius:14px;background:var(--bg);padding:18px 12px;cursor:pointer;display:grid;gap:8px;justify-items:center;font-weight:700;font-family:Montserrat}
 .choice button span{font:400 13px Inter;color:var(--mute)}
@@ -97,12 +96,13 @@ form.stackf{display:grid;gap:14px;text-align:left}
 .fields{display:grid;gap:14px}.chk{display:flex;gap:10px;align-items:center;font-weight:600;font-size:14px;min-height:44px}
 .pastrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto 44px;gap:10px;align-items:end;padding:12px;border-radius:12px;background:var(--panel);font-weight:400}
 .pastrow .chk{min-height:44px;white-space:nowrap}.pastrow .cl{grid-column:1/-1}ul.past{list-style:none;margin:6px 0 4px;padding:0;display:grid;gap:8px}ul.past li{display:grid}
+.seg{display:flex;flex-wrap:wrap;gap:8px}.seg label{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1.5px solid var(--line);border-radius:10px;font-weight:600;font-size:14px;cursor:pointer}.seg label.on{border-color:var(--acc);background:var(--accBg)}.seg input{width:18px;min-height:18px;margin:0;accent-color:var(--acc)}
 .avt td{padding:8px 6px}.avt input[type=time]{min-width:110px}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;padding:16px;z-index:50}
 .modal{background:var(--bg);border-radius:18px;width:min(820px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:clamp(16px,3vw,28px);display:grid;gap:16px}
 .slip{border:1px solid var(--line);border-radius:14px;padding:clamp(14px,2.5vw,24px);display:grid;gap:16px}
 .slip header{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
-.slip header img{width:40px;height:40px;filter:var(--logoF)}
+.slip header img{width:40px;height:40px;border-radius:50%}
 .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}.meta span{display:block;font-size:12px;color:var(--mute)}
 .net{display:flex;justify-content:space-between;align-items:baseline;background:var(--ink);color:var(--bg);border-radius:12px;padding:14px 18px;flex-wrap:wrap;gap:8px}
 .notes{position:fixed;top:72px;right:max(5vw,16px);width:min(380px,calc(100vw - 32px));z-index:40;max-height:70vh;overflow:auto;padding:14px;box-shadow:0 18px 50px rgba(0,0,0,.25)}
@@ -122,12 +122,12 @@ pre,.scroll{overflow-x:auto}
 </head>
 <body>
 <div id="dbnote"></div>
-<div id="app"><div class="login"><p class="mute">Loading Speak n' Link Portal…</p></div></div>
+<div id="app"><div class="login"><p class="mute">Loading Speak2Connect Portal…</p></div></div>
 <div id="modal"></div>
 <div id="toast"></div>
 <script>
 {
-const EMB='data:image/png;base64,{{EMBLEM}}',LOGO='data:image/png;base64,{{LOGO}}';
+const EMB='data:image/png;base64,{{EMBLEM}}',LOGO='data:image/jpeg;base64,{{LOGO}}';
 const $=(s,r=document)=>r.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
@@ -237,7 +237,7 @@ function render(){const v=view();lastView=v;const app=$('#app');
 function header(v){const p=v==='admin'?{name:sess.admin.name}:S.people[v==='client'?sess.cid:sess.fid]||{};
  const label=v==='admin'?'Admin':v==='client'?'Client':'Freelancer';
  const unread=Object.values(S.notes).filter(n=>!n.read).length;
- return `<header class="top"><div class="brand"><img src="${EMB}" alt=""><div><b>Speak n' Link</b><span>PORTAL</span></div></div>
+ return `<header class="top"><div class="brand"><img src="${EMB}" alt=""><div><b>Speak2Connect</b><span>PORTAL</span></div></div>
  <div class="who"><span class="pill">${label} · ${esc(p.name||'')}</span>
  ${v==='admin'?`<button class="btn sm bell" data-act="bell" aria-label="Notifications">Notifications<i id="bellN"${unread?'':' hidden'}>${unread}</i></button>`:''}
  <button class="btn sm acc" data-act="toggle">${v==='admin'?'Switch to freelancer view':'Switch to admin view'}</button>
@@ -253,7 +253,7 @@ function loginHTML(v){
   :r==='client'?`<label class="f"><span class="req">Company name</span><input name="company" required autocomplete="organization"></label><label class="f"><span class="req">Your name</span><input name="name" required autocomplete="name"></label><label class="f"><span class="req">Work email</span><input name="email" type="email" required autocomplete="email"></label>`
   :r==='admin'?`<label class="f"><span class="req">Username</span><input name="user" required autocomplete="username" autocapitalize="off" spellcheck="false"></label><label class="f"><span class="req">Password</span><input name="pass" type="password" required autocomplete="current-password"></label><p class="small" id="loginErr" role="alert" style="color:#c42b1c;margin:0"></p>`:'';
  return `${r==='admin'?'':`<div class="corner"><button class="btn sm ghost" data-act="toggle">Switch to admin view</button></div>`}
- <div class="login"><div class="lcard"><img class="logo" src="${LOGO}" alt="Speak n' Link Portal">
+ <div class="login"><div class="lcard"><img class="logo" src="${LOGO}" alt="Speak2Connect Portal">
  ${r==='admin'?`<div><h1>Admin sign-in</h1><p class="mute">For HR and company admins.</p></div>`:`<div><h1>Welcome to the portal</h1><p class="mute">Sign in to your freelancer account for your profile, timesheets and payslips.</p></div>`}
  ${f?`<form class="stackf" id="loginForm" data-role="${r}" data-mode="${cr?'create':'signin'}">${f}<button class="btn acc" type="submit">${r==='admin'?'Sign in as admin':cr?'Create account':'Sign in'}</button>
  ${r==='admin'?'':cr?`<p class="small mute" style="text-align:center">Already have an account? <button type="button" class="btn link" data-act="loginMode" data-k="signin">Sign in</button></p>`:`<p class="small mute" style="text-align:center">New freelancer? <button type="button" class="btn link" data-act="loginMode" data-k="create">Create an account</button><br>Forgot your password? Ask your admin.</p>`}</form>`:''}
@@ -310,11 +310,18 @@ function portfolioHTML(p,admin){const a=p.profile||{};
  <section class="card"><h3>Details</h3>${cleanPast(a.pastList).length?`<div><p class="small mute">Past clients</p><ul class="past">${cleanPast(a.pastList).map(x=>`<li><b>${esc(x.name)}</b><span class="small mute">${esc(mRange(x))}${mDur(x)?' · '+mDur(x):''}</span></li>`).join('')}</ul></div>`:''}<dl class="dl">${[['Location',a.location],['Experience',a.years!=null&&a.years!==''?`${a.years} years`:''],['Industries',a.industries],['Languages',a.languages],['Past clients',cleanPast(a.pastList).length?'':a.past],['Education',a.education],['Preferred shift',a.shift],['Internet',a.speed?`${a.speed} Mbps${a.backup?' + backup':''}`:'']].filter(x=>x[1]).map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl></section></div>`}
 function fProfileHTML(p){if(!p)return'';const av=p.availability;
  return (hasPhoto(p)?'':`<div class="notice" role="status"><div><b>Recommended: add a professional-looking photo</b><p class="small" style="margin:2px 0 0">A clear, well-lit headshot with a plain background helps clients and admins recognise you.</p></div><button class="btn acc sm" data-act="pickPhoto">Upload photo</button></div>`)+portfolioHTML(p,false)+`<section class="card"><div class="row sp"><div><h3>Availability to work</h3><p class="mute small">${av?`Sent to admin ${ago(av.submittedAt)} · ${esc(av.tz)}`:'Tell the team when you can take shifts.'}</p></div>
- ${ui.availOpen?'':`<button class="btn acc" data-act="openAvail">${av?'Update availability':'Add availability'}</button>`}</div>
- ${av?`<div class="row" style="gap:24px"><div><span class="big">${hrs(av.hours)}</span><p class="small mute">available per week</p></div>${av.notes?`<p class="mute" style="flex:1 1 240px">“${esc(av.notes)}”</p>`:''}</div>${weekStrip(av)}`:`<div class="empty">No availability submitted yet.</div>`}</section>`}
+ ${ui.availOpen?'':`<div class="row">${av&&!av.unavailable?`<button class="btn ghost" data-act="openAvail" data-k="unavailable">Not available at the moment</button>`:''}<button class="btn acc" data-act="openAvail" data-k="available">${av?(av.unavailable?'I\'m available again':'Update availability'):'Add availability'}</button></div>`}</div>
+ ${av?(av.unavailable?`<div class="row" style="gap:16px"><span class="badge warn" style="font-size:14px;padding:6px 12px">Not available at the moment</span>${av.backOn?`<span>Expected back <b>${fmtDY(av.backOn)}</b></span>`:''}</div>${av.notes?`<p class="mute">“${esc(av.notes)}”</p>`:''}`
+  :`<div class="row" style="gap:24px"><div><span class="big">${hrs(av.hours)}</span><p class="small mute">available per week</p></div>${av.notes?`<p class="mute" style="flex:1 1 240px">“${esc(av.notes)}”</p>`:''}</div>${weekStrip(av)}`):`<div class="empty">No availability submitted yet.</div>`}</section>`}
 function renderAvail(){const el=$('#availForm');if(!el)return;if(!ui.availOpen){el.innerHTML='';return}const a=ui.av;
  const opt=z=>`<option${z===a.tz?' selected':''}>${esc(z)}</option>`;
- el.innerHTML=`<section class="card" style="border-color:var(--acc)"><div><h3>When are you available to work?</h3><p class="mute small">Tick each day you can work and set your hours. Shifts that end after midnight are fine.</p></div>
+ const un=a.mode==='unavailable';
+ const seg=`<div class="seg" role="radiogroup" aria-label="Availability status">${[['available',"I'm available to work"],['unavailable','Not available at the moment']].map(([k,l])=>`<label class="${a.mode===k?'on':''}"><input type="radio" name="avmode" data-av="mode" value="${k}"${a.mode===k?' checked':''}> ${l}</label>`).join('')}</div>`;
+ if(un){el.innerHTML=`<section class="card" style="border-color:var(--acc)"><div><h3>Your availability</h3><p class="mute small">Let the admin know you can't take shifts for now.</p></div>${seg}
+  <label class="f">Expected to be available again<small>Optional. Leave blank if you're not sure yet.</small><input type="date" data-av="backOn" value="${esc(a.backOn||'')}" min="${today()}" style="max-width:240px"></label>
+  <label class="f">Reason or notes for the admin<textarea data-av="notes" rows="2" placeholder="Optional, e.g. on leave, studying, other commitments">${esc(a.notes)}</textarea></label>
+  <div class="row" style="justify-content:flex-end"><button class="btn ghost" data-act="closeAvail">Cancel</button><button class="btn acc" data-act="submitAvail">Submit status</button></div></section>`;return}
+ el.innerHTML=`<section class="card" style="border-color:var(--acc)"><div><h3>When are you available to work?</h3><p class="mute small">Tick each day you can work and set your hours. Shifts that end after midnight are fine.</p></div>${seg}
  <label class="f"><span class="req">Your time zone</span><select data-av="tz"><optgroup label="Common">${TZ_TOP.map(opt).join('')}</optgroup><optgroup label="All time zones">${TZ_ALL.filter(z=>!TZ_TOP.includes(z)).map(opt).join('')}</optgroup></select></label>
  <div class="scroll"><table class="avt"><thead><tr><th>Day</th><th>Available</th><th>From</th><th>To</th><th class="n">Hours</th></tr></thead><tbody>
  ${DAYS.map(d=>{const x=a.days[d];return`<tr><td><b>${d}</b></td><td><input type="checkbox" data-av="${d}.on"${x.on?' checked':''} aria-label="${d} available"></td><td><input type="time" data-av="${d}.start" value="${x.start}"${x.on?'':' disabled'}></td><td><input type="time" data-av="${d}.end" value="${x.end}"${x.on?'':' disabled'}></td><td class="n" id="avh-${d}">${x.on?hrs(span(x.start,x.end)/60):'—'}</td></tr>`}).join('')}
@@ -344,7 +351,7 @@ function fTsListHTML(){const es=entries().filter(e=>e.pid===sess.fid&&inWeek(e,u
  <div class="stats"><div class="stat"><span>Total this week</span><b>${hrs(tot)}</b></div>${byClient(es).map(c=>`<div class="stat"><span>${esc(c.client)}</span><b>${hrs(c.hours)}</b></div>`).join('')}</div>
  ${es.length?`<div class="scroll"><table class="stack"><thead><tr><th>Date</th><th>Client</th><th>Time in</th><th>Time out</th><th class="n">Breaks</th><th class="n">Hours</th><th class="n">Actions</th></tr></thead><tbody>${entryRows(es,true)}</tbody></table></div>`:`<div class="empty">No entries for this week yet.</div>`}</section>`}
 function slipHTML(p){const t=psTot(p);const me=S.people[p.pid]||{};
- return`<article class="slip"><header><div class="row"><img src="${EMB}" alt=""><div><b style="font-family:Montserrat">Speak n' Link Portal</b><p class="small mute" style="margin:0">Payslip</p></div></div><span class="badge ${p.status==='released'?'ok':'warn'}">${p.status==='released'?'Released':'Draft'}</span></header>
+ return`<article class="slip"><header><div class="row"><img src="${EMB}" alt=""><div><b style="font-family:Montserrat">Speak2Connect Portal</b><p class="small mute" style="margin:0">Payslip</p></div></div><span class="badge ${p.status==='released'?'ok':'warn'}">${p.status==='released'?'Released':'Draft'}</span></header>
  <div class="meta"><div><span>Freelancer</span><b>${esc(p.pname||me.name)}</b></div><div><span>Payroll cutoff (weekly)</span><b>${fmtDY(p.weekStart)} – ${fmtDY(p.weekEnd)}</b></div><div><span>Exchange rate</span><b>$1 = ${php(t.fx)}</b></div></div>
  <div class="scroll"><table class="stack"><thead><tr><th>Client</th><th class="n">Hourly rate</th><th class="n">Hours worked</th><th class="n">Amount (USD)</th><th class="n">Amount (PHP)</th></tr></thead><tbody>
  ${t.lines.map(l=>`<tr><td>${esc(l.client)}</td><td class="n">${usd(l.rate)}/h</td><td class="n">${hrs(l.hours)}</td><td class="n">${usd(l.usd)}</td><td class="n">${php(l.usd*t.fx)}</td></tr>`).join('')}
@@ -355,13 +362,15 @@ function fPayHTML(){const ps=Object.entries(S.payslips).map(([id,p])=>({id,...p}
  return`<section class="card"><h2>Payslips</h2><p class="mute">Weekly payslips appear here once the admin releases them.</p>
  ${ps.length?`<div class="scroll"><table class="stack"><thead><tr><th>Payroll cutoff</th><th>Clients</th><th class="n">Hours</th><th class="n">Net pay</th><th></th></tr></thead><tbody>${ps.map(p=>{const t=psTot(p);return`<tr class="click" data-act="viewSlip" data-id="${p.id}"><td class="nowrap">${fmtWk(p.weekStart)}</td><td>${esc((p.lines||[]).map(l=>l.client).join(', '))}</td><td class="n">${hrs(t.hours)}</td><td class="n"><b>${php(t.net)}</b></td><td class="n"><span class="btn sm link">View</span></td></tr>`}).join('')}</tbody></table></div>`:`<div class="empty">No payslips released yet.</div>`}</section>`}
 function agentsHTML(){const q=ui.q.trim().toLowerCase();let fs=people('freelancer').filter(p=>ui.inactive||p.status!=='inactive');
- const withAv=fs.filter(p=>p.availability),none=fs.filter(p=>!p.availability);
+ const withAv=fs.filter(p=>p.availability&&!p.availability.unavailable),none=fs.filter(p=>!p.availability);
+ const away=fs.filter(p=>p.availability&&p.availability.unavailable&&(!q||[p.name,p.headline,p.email].join(' ').toLowerCase().includes(q))).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
  let xs=withAv.filter(p=>!q||[p.name,p.headline,p.availability.tz,p.email].join(' ').toLowerCase().includes(q));
  xs.sort(ui.sort==='name'?(a,b)=>(a.name||'').localeCompare(b.name||''):ui.sort==='recent'?(a,b)=>(b.availability.submittedAt||0)-(a.availability.submittedAt||0):(a,b)=>(b.availability.hours||0)-(a.availability.hours||0)||(a.name||'').localeCompare(b.name||''));
  const max=Math.max(1,...xs.map(p=>p.availability.hours||0));const total=xs.reduce((s,p)=>s+(p.availability.hours||0),0);
- return`<div class="stats"><div class="stat"><span>Agents available</span><b>${xs.length}</b></div><div class="stat"><span>Hours offered per week</span><b>${hrs(total)}</b></div><div class="stat"><span>Not yet submitted</span><b>${none.length}</b></div></div>
+ return`<div class="stats"><div class="stat"><span>Agents available</span><b>${xs.length}</b></div><div class="stat"><span>Hours offered per week</span><b>${hrs(total)}</b></div><div class="stat"><span>Not available now</span><b>${away.length}</b></div><div class="stat"><span>Not yet submitted</span><b>${none.length}</b></div></div>
  ${xs.length?xs.map(p=>{const av=p.availability;return`<div class="agent"><div class="agn">${avatarHTML(p,'sm')}<div class="row" style="gap:6px"><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left;min-height:0" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.status==='inactive'?'<span class="badge">Inactive</span>':''}${p.test?'<span class="badge">Test</span>':''}</div><p class="small mute">${esc(p.headline||'')}</p><p class="small mute">${esc(av.tz)} · sent ${ago(av.submittedAt)}</p></div>
- <div class="wkc">${weekStrip(av)}</div><div><b>${hrs(av.hours)}</b><span class="small mute"> / week</span><div class="bar"><i style="width:${(av.hours||0)/max*100}%"></i></div></div><button class="btn sm ghost" data-act="openAgent" data-id="${p.id}">Profile</button></div>`}).join(''):`<div class="empty">${withAv.length?'No agents match your search.':'No freelancer has submitted availability yet.'}</div>`}
+ <div class="wkc">${weekStrip(av)}</div><div><b>${hrs(av.hours)}</b><span class="small mute"> / week</span><div class="bar"><i style="width:${(av.hours||0)/max*100}%"></i></div></div><button class="btn sm ghost" data-act="openAgent" data-id="${p.id}">Profile</button></div>`}).join(''):`<div class="empty">${withAv.length?'No agents match your search.':away.length?'No agents are available right now.':'No freelancer has submitted availability yet.'}</div>`}
+ ${away.length?`<div style="margin-top:18px"><h3>Not available at the moment</h3>${away.map(p=>{const av=p.availability;return`<div class="agent" style="grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto"><div class="agn">${avatarHTML(p,'sm')}<div class="row" style="gap:6px"><button class="btn link" style="padding:0;font-weight:700;font-size:16px;text-align:left;min-height:0" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>${p.test?'<span class="badge">Test</span>':''}</div><p class="small mute">${esc(p.headline||'')}</p></div><div><span class="badge warn">${av.backOn?`Back ${esc(fmtDY(av.backOn))}`:'Return date not set'}</span>${av.notes?`<p class="small mute">“${esc(av.notes)}”</p>`:''}<p class="small mute">Updated ${ago(av.submittedAt)}</p></div><button class="btn sm ghost" data-act="openAgent" data-id="${p.id}">Profile</button></div>`}).join('')}</div>`:''}
  ${none.length?`<div><p class="small mute">Haven't submitted availability: ${none.map(p=>`<button class="btn sm link" style="padding:0 4px" data-act="openAgent" data-id="${p.id}">${esc(p.name)}</button>`).join(' ')}</p></div>`:''}`}
 function adminTsHTML(){const w=ui.aweek;const es=entries().filter(e=>inWeek(e,w));const fs=people('freelancer');const by={};es.forEach(e=>(by[e.pid]=by[e.pid]||[]).push(e));
  const ids=Object.keys(by).sort((a,b)=>(S.people[a]?.name||'').localeCompare(S.people[b]?.name||''));const tot=es.reduce((s,e)=>s+(+e.hours||0),0);
@@ -397,7 +406,7 @@ function notesHTML(){const ns=Object.entries(S.notes).map(([id,n])=>({id,...n}))
  ${ns.length?ns.map(n=>`<button class="note${n.read?'':' unread'}" data-act="note" data-id="${n.id}"><b>${esc(n.text)}</b><span class="small mute">${ago(n.at)}</span></button>`).join(''):'<p class="mute">No notifications yet.</p>'}</div>`}
 function clientHTML(){const c=S.people[sess.cid];const k=ckey(c.company);const es=entries().filter(e=>ckey(e.client)===k&&inWeek(e,ui.cweek));const tot=es.reduce((s,e)=>s+(+e.hours||0),0);
  const by={};es.forEach(e=>{(by[e.pid]=by[e.pid]||{name:e.pname,h:0}).h+=+e.hours||0});
- return`<section class="card"><div class="row sp"><div><h2>${esc(c.company)}</h2><p class="mute">Hours your Speak n' Link agents have logged.</p></div>${wkNav('cweek')}</div>
+ return`<section class="card"><div class="row sp"><div><h2>${esc(c.company)}</h2><p class="mute">Hours your Speak2Connect agents have logged.</p></div>${wkNav('cweek')}</div>
  <div class="stats"><div class="stat"><span>Total hours</span><b>${hrs(tot)}</b></div>${Object.values(by).map(a=>`<div class="stat"><span>${esc(a.name)}</span><b>${hrs(a.h)}</b></div>`).join('')}</div>
  ${es.length?`<div class="scroll"><table class="stack"><thead><tr><th>Date</th><th>Agent</th><th>Client</th><th>Time in</th><th>Time out</th><th class="n">Breaks</th><th class="n">Hours</th></tr></thead><tbody>${entryRows(es,false).replace(/ class="click" data-act="openEntry" data-id="[^"]*"/g,'')}</tbody></table></div>`:`<div class="empty">No hours logged for ${esc(c.company)} this week.</div>`}</section>`}
 
@@ -411,7 +420,7 @@ function modalBody(){const m=ui.modal;if(!m)return'';
   return`<div style="display:grid;gap:16px">${portfolioHTML(p,true)}<section class="card soft"><div class="row sp"><h3>Sign-in details</h3><span class="small mute">Visible to admins only. Share privately if the freelancer forgets.</span></div>
   <dl class="dl"><dt>Email</dt><dd>${esc(p.email)}</dd><dt>Password</dt><dd><span class="row" style="gap:6px"><code style="font-size:16px">${p.password?(sh?esc(p.password):'••••••••'):'<span class="mute">Not set yet (set on first sign-in)</span>'}</code>${p.password?`<button class="btn sm link" data-act="showPw" data-id="${m.id}">${sh?'Hide':'Show'}</button><button class="btn sm link" data-act="copyPw" data-id="${m.id}">Copy</button>`:''}</span>${p.passwordSetAt?`<span class="small mute">Last changed ${ago(p.passwordSetAt)}</span>`:''}</dd></dl>
   <div class="row"><input id="newPw" type="text" autocomplete="off" placeholder="New password (6+ characters)" style="flex:1 1 220px;width:auto"><button class="btn sm" data-act="setPw" data-id="${m.id}">Set new password</button></div></section>
-  <section class="card"><h3>Availability</h3>${av?`<p><b>${hrs(av.hours)}</b> per week · ${esc(av.tz)} · sent ${ago(av.submittedAt)}</p>${weekStrip(av)}${av.notes?`<p class="mute">“${esc(av.notes)}”</p>`:''}`:'<p class="mute">Not submitted yet.</p>'}</section>
+  <section class="card"><h3>Availability</h3>${av&&av.unavailable?`<p><span class="badge warn">Not available at the moment</span>${av.backOn?` · expected back <b>${esc(fmtDY(av.backOn))}</b>`:''} · updated ${ago(av.submittedAt)}</p>${av.notes?`<p class="mute">“${esc(av.notes)}”</p>`:''}`:av?`<p><b>${hrs(av.hours)}</b> per week · ${esc(av.tz)} · sent ${ago(av.submittedAt)}</p>${weekStrip(av)}${av.notes?`<p class="mute">“${esc(av.notes)}”</p>`:''}`:'<p class="mute">Not submitted yet.</p>'}</section>
   <div class="row sp"><span class="small mute">Status: ${p.status==='inactive'?'Inactive':'Active'}</span><button class="btn ghost" data-act="toggleActive" data-id="${m.id}">${p.status==='inactive'?'Mark active':'Mark inactive'}</button></div></div>`}
  if(m.type==='pw'){const me=S.people[sess.fid]||{};return`<form class="stackf">${me.password?'<label class="f">Current password<input id="pwOld" type="password" autocomplete="current-password"></label>':'<input id="pwOld" type="hidden" value="">'}<label class="f">New password<input id="pwNew" type="password" minlength="6" autocomplete="new-password"><small>At least 6 characters.</small></label><label class="f">Confirm new password<input id="pwNew2" type="password" autocomplete="new-password"></label><p class="small" id="pwErr" role="alert" style="color:#c42b1c;margin:0"></p><div class="row sp"><button type="button" class="btn ghost" data-act="closeModal">Cancel</button><button type="button" class="btn acc" data-act="savePw">Change password</button></div></form>`}
  if(m.type==='entry'){const e=S.timesheets[m.id];if(!e)return'<p class="mute">This entry was removed.</p>';const c=ui.confirm==='ae:'+m.id;
@@ -433,7 +442,7 @@ function modalBody(){const m=ui.modal;if(!m)return'';
   <div class="row sp"><button class="btn ghost" data-act="viewSlip" data-id="${m.id}">Cancel</button><button class="btn acc" data-act="peSave" data-id="${m.id}">Save payslip</button></div></div>`}
  return''}
 
-function slipText(p){const t=psTot(p);return[`SPEAK N' LINK PORTAL — PAYSLIP (${p.status==='released'?'Released':'Draft'})`,`Freelancer: ${p.pname}`,`Payroll cutoff: ${fmtDY(p.weekStart)} – ${fmtDY(p.weekEnd)}`,`Exchange rate: $1 = ${php(t.fx)}`,'',
+function slipText(p){const t=psTot(p);return[`SPEAK2CONNECT PORTAL — PAYSLIP (${p.status==='released'?'Released':'Draft'})`,`Freelancer: ${p.pname}`,`Payroll cutoff: ${fmtDY(p.weekStart)} – ${fmtDY(p.weekEnd)}`,`Exchange rate: $1 = ${php(t.fx)}`,'',
  ...t.lines.map(l=>`${l.client}: ${hrs(l.hours)} × ${usd(l.rate)}/h = ${usd(l.usd)} (${php(l.usd*t.fx)})`),`Gross: ${usd(t.gUsd)} = ${php(t.gPhp)}`,...(p.adjustments||[]).map(a=>`${a.label}: ${php(a.amount)}`),`NET PAY: ${php(t.net)}`,p.notes?`Notes: ${p.notes}`:''].join('\n')}
 
 async function login(form){const fd=Object.fromEntries(new FormData(form));const role=form.dataset.role;const email=String(fd.email||'').trim().toLowerCase();
@@ -465,7 +474,7 @@ const ACT={
  testLogin:d=>{const f=$('#loginForm');if(!f)return;f.email.value=d.k+'@test.com';f.pass.value='test1234';login(f)},
  loginMode:d=>{ui.loginMode=d.k;render();setTimeout(()=>$('#loginForm input')?.focus(),0)},
  showPw:d=>{ui.showPw=ui.showPw||{};ui.showPw[d.id]=!ui.showPw[d.id];paint('modalBody',modalBody())},
- copyPw:async d=>{const p=S.people[d.id];try{await navigator.clipboard.writeText(`Speak n' Link Portal\nEmail: ${p.email}\nPassword: ${p.password||''}`);toast('Sign-in details copied')}catch(e){toast('Copy was blocked by the browser.')}},
+ copyPw:async d=>{const p=S.people[d.id];try{await navigator.clipboard.writeText(`Speak2Connect Portal\nEmail: ${p.email}\nPassword: ${p.password||''}`);toast('Sign-in details copied')}catch(e){toast('Copy was blocked by the browser.')}},
  setPw:async d=>{const i=$('#newPw');const v=i?String(i.value):'';if(v.length<6){toast('Passwords are at least 6 characters.');return}if(await W(()=>col('people').doc(d.id).update({password:v,passwordSetAt:Date.now()}),'Password updated. Share it with the freelancer.')){ui.showPw=ui.showPw||{};ui.showPw[d.id]=true;i.value='';i.blur();paint('modalBody',modalBody())}},
  changePw:()=>openModal({type:'pw',title:'Change password'}),
  savePw:async()=>{const a=String($('#pwOld').value),b=String($('#pwNew').value),c=String($('#pwNew2').value);const me=S.people[sess.fid];const e=$('#pwErr');
@@ -487,11 +496,16 @@ const ACT={
   const ok=await W(()=>col('people').doc(sess.fid).update({name:String(a.name).trim(),profile,summary:a.summary,headline:a.headline,vocaroo:a.vocaroo,onboarded:true,profileUpdatedAt:Date.now()}),'Portfolio saved');
   if(ok){LS.set('snl.ob.'+sess.fid,null);ui.editing=false;ui.ftab='profile';render()}},
  editPortfolio:()=>{const p=S.people[sess.fid];ui.ob={...clone(p.profile),pastList:cleanPast(p.profile&&p.profile.pastList).length?cleanPast(p.profile.pastList):(p.profile&&p.profile.past?[{...newPast(),name:p.profile.past}]:[newPast()]),name:p.name,vocaroo:p.vocaroo,vocOk:true,summary:p.summary,headline:p.headline};ui.step=0;ui.editing=true;render()},
- openAvail:()=>{const av=S.people[sess.fid].availability;ui.av=av?clone(av):{tz:myTZ,notes:'',days:Object.fromEntries(DAYS.map((d,i)=>[d,{on:i<5,start:'09:00',end:'18:00'}]))};if(!ui.av.tz)ui.av.tz=myTZ;ui.availOpen=true;renderData();renderAvail();$('#availForm').scrollIntoView({behavior:'smooth'})},
+ openAvail:d=>{const av=S.people[sess.fid].availability;ui.av=av?clone(av):{tz:myTZ,notes:'',days:Object.fromEntries(DAYS.map((d,i)=>[d,{on:i<5,start:'09:00',end:'18:00'}]))};if(!ui.av.tz)ui.av.tz=myTZ;if(!ui.av.days)ui.av.days=Object.fromEntries(DAYS.map((d,i)=>[d,{on:i<5,start:'09:00',end:'18:00'}]));ui.av.mode=d&&d.k==='unavailable'?'unavailable':'available';if(ui.av.mode==='available'&&av&&av.unavailable)ui.av.notes='';ui.availOpen=true;renderData();renderAvail();$('#availForm').scrollIntoView({behavior:'smooth'})},
  closeAvail:()=>{ui.availOpen=false;renderAvail();renderData()},
  copyMon:()=>{const m=ui.av.days.Mon;['Tue','Wed','Thu','Fri'].forEach(d=>ui.av.days[d]={...m});renderAvail()},
- submitAvail:async()=>{const a=ui.av;const h=availHours(a);if(!h){toast('Tick at least one day with working hours.');return}
-  const me=S.people[sess.fid];const av={tz:a.tz,days:a.days,notes:String(a.notes||'').trim(),hours:h,submittedAt:Date.now()};
+ submitAvail:async()=>{const a=ui.av;const me=S.people[sess.fid];
+  if(a.mode==='unavailable'){const av={unavailable:true,backOn:a.backOn||'',tz:a.tz,days:a.days,notes:String(a.notes||'').trim(),hours:0,submittedAt:Date.now()};
+   if(!await W(()=>col('people').doc(sess.fid).update({availability:av})))return;
+   await W(()=>col('notes').add({kind:'availability',pid:sess.fid,text:`${me.name} is not available at the moment${av.backOn?` (expected back ${fmtDY(av.backOn)})`:''}`,at:Date.now(),read:false}),'Status submitted. The admin has been notified.');
+   ui.availOpen=false;renderAvail();renderData();return}
+  const h=availHours(a);if(!h){toast('Tick at least one day with working hours.');return}
+  const av={unavailable:false,tz:a.tz,days:a.days,notes:String(a.notes||'').trim(),hours:h,submittedAt:Date.now()};
   const ok=await W(()=>col('people').doc(sess.fid).update({availability:av}));if(!ok)return;
   await W(()=>col('notes').add({kind:'availability',pid:sess.fid,text:`${me.name} submitted availability: ${hrs(h)} a week (${a.tz})`,at:Date.now(),read:false}),'Availability submitted. The admin has been notified.');
   ui.availOpen=false;renderAvail();renderData()},
@@ -544,7 +558,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(ui.modal)closeMo
 const val=t=>t.type==='checkbox'?t.checked:t.value;
 function onField(e){const t=e.target,ds=t.dataset;
  if(ds.ob){if(ds.ob.includes('.'))setPath(ui.ob,ds.ob,val(t));else ui.ob[ds.ob]=val(t);if(ds.ob.endsWith('.current')&&e.type==='change')renderOnboard();if(sess.fid&&!ui.editing)LS.set('snl.ob.'+sess.fid,ui.ob);return}
- if(ds.av){setPath(ui.av,ds.av,val(t));if(ds.av.endsWith('.on')){renderAvail();return}const d=ds.av.split('.')[0];const x=ui.av.days[d];const c=$('#avh-'+d);if(c&&x)c.textContent=x.on?hrs(span(x.start,x.end)/60):'—';const tt=$('#avTot');if(tt)tt.textContent=hrs(availHours(ui.av));return}
+ if(ds.av){if(t.type==='radio'&&!t.checked)return;setPath(ui.av,ds.av,val(t));if(ds.av.endsWith('.on')||ds.av==='mode'){renderAvail();return}if(ds.av==='backOn'||ds.av==='notes')return;const d=ds.av.split('.')[0];const x=ui.av.days[d];const c=$('#avh-'+d);if(c&&x)c.textContent=x.on?hrs(span(x.start,x.end)/60):'—';const tt=$('#avTot');if(tt)tt.textContent=hrs(availHours(ui.av));return}
  if(ds.ts){if(ds.ts==='date')ui.ts.date=t.value;else{const[i,k]=ds.ts.split('.');ui.ts.rows[+i][k]=t.value;const o=$('#tsTot-'+i);if(o)o.textContent=hrs(rowHours(ui.ts.rows[+i]))}const g=$('#tsGrand');if(g)g.textContent=hrs(ui.ts.rows.reduce((s,r)=>s+rowHours(r),0));return}
  if(ds.pe){setPath(ui.edit,ds.pe,t.value);const tt=psTot(ui.edit);tt.lines.forEach((l,i)=>{const c=$('#peL'+i);if(c)c.textContent=usd(l.usd)});const n=$('#peNet .big');if(n)n.textContent=php(tt.net);return}
  if(t.id==='agQ'){ui.q=t.value;paintAgents()}}
