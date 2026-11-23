@@ -176,7 +176,7 @@ let db=null,loaded=false;
 const S={people:{},timesheets:{},rates:{},payslips:{},notes:{},clients:{},settings:{fx:0}};
 let sess=LS.get('snl.sess',{});if(sess.admin&&sess.admin.v!==2)delete sess.admin;
 const TEST_IDS=['f_test@test.com','f_test2@test.com','f_test3@test.com'];
-const ADMINS={'488fad9002c9d855c0d195866ae28734351200c5ccc15ad584b20af096e6eee8':'admin','d68db0c14ea4dd9990406b14a4c7cd5339201d6ff64a70b99d18d3b2859e187e':'payroll'};
+const ADMINS={'488fad9002c9d855c0d195866ae28734351200c5ccc15ad584b20af096e6eee8':'admin','e97d3e6b74427270e2c594c44a5c0cda1b249246ff3b9e7951e767af1761851f':'payroll'};
 const isPayroll=()=>!!(sess.admin&&sess.admin.role==='payroll');
 async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 const saveSess=()=>LS.set('snl.sess',sess);
