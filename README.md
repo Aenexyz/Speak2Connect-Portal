@@ -37,7 +37,7 @@ Live versions:
 - **Timesheets:** weekly grid of agents by day. Click an agent to see their entries, then click an entry to view, edit or delete it.
 - **Payslips:**
   - Enter the USD to PHP exchange rate.
-  - Optional **weekend rate (Sat–Sun)** for USD/hr rates. Hours on timesheet entries dated Saturday or Sunday are paid at the weekend rate; the payslip then shows two lines for that client (Mon–Fri and Sat–Sun). Leave it blank to pay weekends at the regular rate. A shift counts on the date it started.
+  - Optional **weekend rate (Sat–Sun)** for USD/hr rates. Hours on timesheet entries dated Saturday or Sunday are paid at the weekend rate; the payslip then shows two lines for that client (Mon–Fri and Sat–Sun). Turn it on with the Yes/No switch in the Weekend rate column, then enter the rate; switching it off pays weekends at the regular rate. A shift counts on the date it started.
   - Remove a rate that is no longer needed with the **(−)** button next to the agent's name (asks to confirm first). A rate can only be removed if the agent has never logged hours for that client; otherwise the button is disabled or explains why.
   - Set the rate for each agent and client (default **USD/hr**; the on/off switch next to each rate flips it to **PHP/week**), either **USD / hour** (hours × rate × exchange rate) or a **PHP / week** rate for a 40-hour week (paid per hour as rate ÷ 40 × hours logged, e.g. ₱5,000/week = ₱125/h; the payslip shows the weekly rate and its USD equivalent for reference).
   - Auto-generate payslips for each weekly cutoff (Monday to Sunday).
