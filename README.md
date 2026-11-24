@@ -38,7 +38,7 @@ Live versions:
 - **Payslips:**
   - Enter the USD to PHP exchange rate.
   - Remove a rate that is no longer needed with the **(−)** button next to the agent's name (asks to confirm first). A rate can only be removed if the agent has never logged hours for that client; otherwise the button is disabled or explains why.
-  - Set the rate for each agent and client (default **USD / hour**; the gear next to each rate switches it), either **USD / hour** (hours × rate × exchange rate) or a **PHP / week** rate for a 40-hour week (paid per hour as rate ÷ 40 × hours logged, e.g. ₱5,000/week = ₱125/h; the payslip shows its USD equivalent for reference).
+  - Set the rate for each agent and client (default **USD/hr**; the on/off switch next to each rate flips it to **PHP/week**), either **USD / hour** (hours × rate × exchange rate) or a **PHP / week** rate for a 40-hour week (paid per hour as rate ÷ 40 × hours logged, e.g. ₱5,000/week = ₱125/h; the payslip shows its USD equivalent for reference).
   - Auto-generate payslips for each weekly cutoff (Monday to Sunday).
   - Edit lines and adjustments (bonuses or deductions in PHP).
   - View, release or unrelease payslips, or copy them as text.
